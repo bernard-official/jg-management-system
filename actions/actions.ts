@@ -1,41 +1,40 @@
-'use server'
+"use server";
 
-import { SignUpFormSchema } from "@/lib/zodSchema"
-import { error } from "console"
-import { Sign } from "crypto"
+import db from "@/db/mongodb";
+import { FormState, SignupFormSchema } from "@/lib/zodSchema";
 
 // export const login = async (state, formData) => {
-    
+
 // }
 
-export const signup = async (prevState: null, formData : FormData) => {
+export async function signup(
+  state: FormState,
+  formData: FormData
+): Promise<FormState> {
+  // 1. Validate form fields
+  
+  const validatedFields = SignupFormSchema.safeParse({
+    name: formData.get("name"),
+    email: formData.get("email"),
+    password: formData.get("password"),
+  });
 
-    //1. validate fields
-    const validateSignUp = SignUpFormSchema.safeParse({
-        name: formData.get('name'),
-        email: formData.get('email'),
-        password: formData.get('password')
-    })
-    
-    // if (!validateSignUp.success){
-    //     return {
-    //         errors: validateSignUp.error.flatten().fieldErrors
-    //     }
-    // }
-    if (!validateSignUp.success){
-        const errors:{ [key: string]: { _error: string } } = {}
+  // If any form fields are invalid, return early
+  if (!validatedFields.success) {
+    return {
+      errors: validatedFields.error.flatten().fieldErrors,
+    };
+  }
 
-      
-        validateSignUp.error.issues.forEach(issue => {
-            errors[issue.path[0]] = {
-                _error: issue.message
-            }
-        })
-        
-        return {
-            errors,
-            errorMessage: "Check sign up credentials again",
-            
-        }
-    }
+  // 2. Prepare data for insertion into database
+  const { name, email, password } = validatedFields.data;
+
+  //3. Check if email exist in the database
+  const existingUser = await db.collection("users").findOne({ email });
+
+  if (existingUser) {
+    return {
+      message: 'Email already exists, please use a different email or login.',
+    };
+  }
 }
