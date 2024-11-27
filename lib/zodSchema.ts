@@ -1,6 +1,7 @@
 import { z } from 'zod';
 
 
+
 export const SignupFormSchema = z.object({
     name: z
       .string()
@@ -24,17 +25,26 @@ export const SignupFormSchema = z.object({
   });
 
 
-  //the part below is from the auth you video
   export type FormState =
   | {
       errors?: {
-        name?: string[];
+        
         email?: string[];
         password?: string[];
       };
       message?: string;
     }
   | undefined;
+//   export type FormState =
+//   | {
+//       errors?: {
+//         name?: string[];
+//         email?: string[];
+//         password?: string[];
+//       };
+//       message?: string;
+//     }
+//   | undefined;
 
 export type SessionPayload = {
   userId: string | number;

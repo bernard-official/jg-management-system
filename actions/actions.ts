@@ -1,40 +1,126 @@
-"use server";
+'use server';
 
-import db from "@/db/mongodb";
-import { FormState, SignupFormSchema } from "@/lib/zodSchema";
+import { createClient } from "@/lib/supabase/server";
+// import { FormState, SignupFormSchema } from "@/lib/zodSchema";
+import { revalidatePath } from "next/cache";
+import { redirect } from "next/navigation";
 
-// export const login = async (state, formData) => {
+export async function login(formData: FormData) {
+    const supabase = await createClient()
+  
+    // type-casting here for convenience
+    // in practice, you should validate your inputs
+    const data = {
+      email: formData.get('email') as string,
+      password: formData.get('password') as string,
+    }
+  
+    const { error } = await supabase.auth.signInWithPassword(data)
+  
+    if (error) {
+      redirect('/error')
+    }
+  
+    revalidatePath('/', 'layout')
+    redirect('/')
+  }
+  
+
+
+
+  export async function signup(formData: FormData) {
+    const supabase = await createClient()
+  
+    // type-casting here for convenience
+    // in practice, you should validate your inputs
+    const data = {
+      email: formData.get('email') as string,
+      password: formData.get('password') as string,
+    }
+  
+    const { error } = await supabase.auth.signUp(data)
+  
+    if (error) {
+      redirect('/error')
+    }
+  
+    revalidatePath('/', 'layout')
+    redirect('/')
+  }
+
+
+
+
+
+
+
+
+
+
+
+// export async function signup(
+//   state: FormState,
+//   formData: FormData
+// ): Promise<FormState> {
+
+//   const supabase = await createClient();
+
+//   // 1. Validate form fields
+  
+
+//   const data = SignupFormSchema.safeParse({
+//     name: formData.get("name"),
+//     email: formData.get("email"),
+//     password: formData.get("password"),
+//   });
+ 
+//   const { error } = await supabase.auth.signUp(data)
+
+//   if (error) {
+//     redirect('/error')
+//   }
+
+//   revalidatePath('/', 'layout')
+//   redirect('/')
 
 // }
 
-export async function signup(
-  state: FormState,
-  formData: FormData
-): Promise<FormState> {
-  // 1. Validate form fields
+
+
+
+// export async function signup(
+//   state: FormState,
+//   formData: FormData
+// ): Promise<FormState> {
+
+// const supabase = await createClient();
+
+//   // 1. Validate form fields
   
-  const validatedFields = SignupFormSchema.safeParse({
-    name: formData.get("name"),
-    email: formData.get("email"),
-    password: formData.get("password"),
-  });
+//   const validatedFields = SignupFormSchema.safeParse({
+//     name: formData.get("name"),
+//     email: formData.get("email"),
+//     password: formData.get("password"),
+//   });
 
-  // If any form fields are invalid, return early
-  if (!validatedFields.success) {
-    return {
-      errors: validatedFields.error.flatten().fieldErrors,
-    };
-  }
+//   // If any form fields are invalid, return early
+//   if (!validatedFields.success) {
+//     return {
+//       errors: validatedFields.error.flatten().fieldErrors,
+//     };
+//   }
 
-  // 2. Prepare data for insertion into database
-  const { name, email, password } = validatedFields.data;
+//   // 2. Prepare data for insertion into database
+// //   const { name, email, password } = validatedFields.data;
 
-  //3. Check if email exist in the database
-  const existingUser = await db.collection("users").findOne({ email });
+//   const data = validatedFields.data;
 
-  if (existingUser) {
-    return {
-      message: 'Email already exists, please use a different email or login.',
-    };
-  }
-}
+// const { error } = await supabase.auth.signUp(data)
+
+// if (error) {
+//   redirect('/error')
+// }
+
+// revalidatePath('/', 'layout')
+// redirect('/')
+// }
