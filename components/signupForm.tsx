@@ -1,5 +1,5 @@
 "use client";
-import React, { useActionState } from "react";
+import React from "react";
 import { Card } from "./ui/card";
 import { Input } from "./ui/input";
 import { Button } from "./ui/button";
@@ -11,6 +11,7 @@ export const SignUpForm = () => {
   return (
     <>
       <Card className="p-8  w-[400px] md:w-1/4 .h-[60vh] border  flex flex-col justify-center">
+
         <form className="space-y-8">
           <span>JASGLYNN</span>
          
@@ -24,7 +25,7 @@ export const SignUpForm = () => {
           </div>
           
 
-          <div>
+          <div className="flex flex-col space-y-4">
           <Button formAction={login}>Log in</Button>
           <Button formAction={signup}>Sign up</Button>
           </div>
