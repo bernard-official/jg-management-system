@@ -1,12 +1,13 @@
-import { signIn, signUp } from "@/actions/actions";
+import { signIn, signOut, signUp } from "@/actions/actions";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import React from "react";
 import { SubmitButton } from "./submit-button";
 
-// const Login = ({ searchParams }: { searchParams: { message: string } }) => {
-const Login = () => {
+const Login = async({ searchParams }: { searchParams: { message: string } }) => {
+  const params = await searchParams;
+// const Login = () => {
   return (
     <div className="flex min-h-screen justify-center items-center border border-red-500  ">
       {/* <LoginForm /> */}
@@ -30,9 +31,11 @@ const Login = () => {
           <Button formAction={signIn} >Log in</Button>
           
           <Button formAction={signUp}>Sign up</Button>
+          
+          <Button formAction={signOut}>Sign Out</Button>
 
 
-          {/* <SubmitButton
+          <SubmitButton
           formAction={signIn}
           className="bg-green-700 rounded-md px-4 py-2 text-foreground mb-2"
           pendingText="Signing In..."
@@ -46,12 +49,11 @@ const Login = () => {
           >
           Sign Up
           </SubmitButton>
-        {searchParams?.message && (
+        {params?.message && (
           <p className="mt-4 p-4 bg-foreground/10 text-foreground text-center">
-            {searchParams.message}
+            {params.message}
             </p>
-        )} */}
-
+        )}
 
             </div>
 
