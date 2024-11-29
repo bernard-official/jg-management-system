@@ -22,7 +22,7 @@ export async function signIn(formData: FormData) {
     }
   
     revalidatePath('/', 'layout')
-    redirect('/')
+    redirect('/protected')
   }
   
 
@@ -45,7 +45,7 @@ export async function signIn(formData: FormData) {
     }
   
     revalidatePath('/', 'layout')
-    redirect('/')
+    redirect('/protected')
   }
 
 
@@ -130,3 +130,7 @@ export async function signIn(formData: FormData) {
 // revalidatePath('/', 'layout')
 // redirect('/')
 // }
+
+
+
+
