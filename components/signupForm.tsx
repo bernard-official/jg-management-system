@@ -3,7 +3,7 @@ import React from "react";
 import { Card } from "./ui/card";
 import { Input } from "./ui/input";
 import { Button } from "./ui/button";
-import { login, signup } from "@/actions/actions";
+import { signIn, signUp} from "@/actions/actions";
 
 export const SignUpForm = () => {
   // const [state, action, pending] = useActionState(signup, undefined);
@@ -26,8 +26,8 @@ export const SignUpForm = () => {
           
 
           <div className="flex flex-col space-y-4">
-          <Button formAction={login}>Log in</Button>
-          <Button formAction={signup}>Sign up</Button>
+          <Button formAction={signIn}>Log in</Button>
+          <Button formAction={signUp}>Sign up</Button>
           </div>
         </form>
       </Card>
@@ -50,21 +50,21 @@ export const SignUpForm = () => {
 //           )}
 
 //           <div>
-//           <Input placeholder="name" type="name" />
+//           <Input placeholder="name" type="name" name="name" />
 //           {state?.errors?.name && (
 //             <p className="text-sm text-red-500">{state.errors.name}</p>
 //           )}
 //           </div>
 //           <div>
 
-//           <Input placeholder="example@email.com" />
+//           <Input placeholder="example@email.com" name="email" />
 //           {state?.errors?.email && (
 //             <p className="text-sm text-red-500">{state.errors.email}</p>
 //           )}
 //           </div>
 //           <div>
 
-//           <Input placeholder="password" type="password" />
+//           <Input placeholder="password" type="password" name="password" />
 //           {state?.errors?.password && (
 //             <div className="text-sm text-red-500">
 //               <p>Password must:</p>

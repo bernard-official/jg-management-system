@@ -1,7 +1,8 @@
 import React from 'react'
 import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator } from './ui/breadcrumb'
 import { SearchForm } from './search-form'
-import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar'
+import { Profile } from './userProfile'
+
 
 const Header = () => {
   return (
@@ -19,12 +20,9 @@ const Header = () => {
               </BreadcrumbItem>
             </BreadcrumbList>
           </Breadcrumb>
-          <div className='flex items-center justify-between space-x-4'>
+          <div className='flex items-center justify-between space-x-4 p-1'>
             <SearchForm />
-            <Avatar> 
-            <AvatarImage src="https://github.com/shadcn.png" alt="@shadcn" />
-            <AvatarFallback>JG</AvatarFallback>
-            </Avatar>
+            <Profile />
           </div>
     </div>
   )

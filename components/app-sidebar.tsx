@@ -40,44 +40,33 @@ const data = {
           url: "#",
           isActive: true,
         },
+      ],
+    },
+    {
+      title: "Assets",
+      url: "#",
+      items: [
         {
-          title: "Rendering",
+          title: "Venue",
+          url: "",
+        },
+        {
+          title: "Shops",
+          url: "#",
+          isActive: true,
+        },
+      ],
+    },
+    {
+      title: "Operations",
+      url: "#",
+      items: [
+        {
+          title: "Bookings",
           url: "#",
         },
         {
-          title: "Caching",
-          url: "#",
-        },
-        {
-          title: "Styling",
-          url: "#",
-        },
-        {
-          title: "Optimizing",
-          url: "#",
-        },
-        {
-          title: "Configuring",
-          url: "#",
-        },
-        {
-          title: "Testing",
-          url: "#",
-        },
-        {
-          title: "Authentication",
-          url: "#",
-        },
-        {
-          title: "Deploying",
-          url: "#",
-        },
-        {
-          title: "Upgrading",
-          url: "#",
-        },
-        {
-          title: "Examples",
+          title: "Reports",
           url: "#",
         },
       ],
@@ -101,15 +90,15 @@ const data = {
       ],
     },
     {
-      title: "Architecture",
+      title: "Staff",
       url: "#",
       items: [
         {
-          title: "Accessibility",
-          url: "#",
+          title: "Staff Management",
+          url: "/userManagement",
         },
         {
-          title: "Fast Refresh",
+          title: "Roles &  Permissions",
           url: "#",
         },
         {
