@@ -1,8 +1,10 @@
 'use server';
 
 import { createClient } from "@/lib/supabase/server";
+import { encodedRedirect } from "@/utils/utils";
 // import { FormState, SignupFormSchema } from "@/lib/zodSchema";
 import { revalidatePath } from "next/cache";
+import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 
 export async function signIn(formData: FormData) {
@@ -56,6 +58,43 @@ export async function signIn(formData: FormData) {
     redirect('/dashboard')
   }
 
+  export const forgotPasswordAction = async (formData: FormData) => {
+    const email = formData.get('email')?.toString();
+    // console.log(email)
+    const supabase = await createClient();
+    const origin = (await headers()).get('origin')
+    
+    if (!email){
+      return encodedRedirect("error","/forgot-password", "Email is required")
+    }
+
+    const {error} = await supabase.auth.resetPasswordForEmail(email, { redirectTo:`${origin}/reset-password?email=${email}` })
+    
+    
+  }
+
+  export const resetPasswordAction = async (formData: FormData) => {
+    const supabase = await createClient();
+  
+    const password = formData.get("password") as string;
+    const confirmPassword = formData.get("confirmPassword") as string;
+  
+    if (!password || !confirmPassword) {
+      encodedRedirect(
+        "error",
+        "/protected/reset-password",
+        "Password and confirm password are required",
+      );
+    }
+  
+    if (password !== confirmPassword) {
+      encodedRedirect(
+        "error",
+        "/reset-password",
+        "Passwords do not match",
+      );
+    }
+  }
 
   export const signOut = async () => {
     const supabase = await createClient()

@@ -11,33 +11,27 @@ import {
   SidebarMenuItem,
   SidebarRail,
 } from "./ui/sidebar";
-import { VersionSwitcher } from "./version-switcher";
 
 // This is sample data.
 const data = {
   versions: ["1.0.1", "1.1.0-alpha", "2.0.0-beta1"],
   navMain: [
+    
     {
-      title: "Dashboard",
+      title: "Orders",
       url: "#",
       items: [
         {
-          title: "Analytics",
-          url: "/dashboard",
-        },
-      ],
-    },
-    {
-      title: "Finance",
-      url: "#",
-      items: [
+            title: "Quick Order",
+            url: "/restaurant",
+          },
         {
-          title: "Financial History",
-          url: "/finance",
+          title: "Table orders",
+          url: "/restaurant/table-orders",
         },
         {
-          title: "Data Fetching",
-          url: "#",
+          title: "Orders",
+          url: "/restaurant/orders",
           isActive: true,
         },
       ],
@@ -47,73 +41,72 @@ const data = {
       url: "#",
       items: [
         {
-          title: "Venue",
+          title: "Table Reservations",
           url: "",
         },
         {
-          title: "Shops",
+          title: "End of Day",
           url: "#",
           isActive: true,
         },
       ],
     },
-    {
-      title: "Operations",
-      url: "#",
-      items: [
-        {
-          title: "Bookings",
-          url: "#",
-        },
-        {
-          title: "Reports",
-          url: "#",
-        },
-      ],
-    },
-    {
-      title: "Inventory",
-      url: "#",
-      items: [
-        {
-          title: "Full Menu",
-          url: "#",
-        },
-        {
-          title: "Stock Levels",
-          url: "#",
-        },
-        {
-          title: "Reports",
-          url: "#",
-        },
-      ],
-    },
-    {
-      title: "Staff",
-      url: "#",
-      items: [
-        {
-          title: "Staff Management",
-          url: "/userManagement",
-        },
-        {
-          title: "Roles &  Permissions",
-          url: "#",
-        },
-      ],
-    },
+    // {
+    //   title: "Operations",
+    //   url: "#",
+    //   items: [
+    //     {
+    //       title: "Bookings",
+    //       url: "#",
+    //     },
+    //     {
+    //       title: "Reports",
+    //       url: "#",
+    //     },
+    //   ],
+    // },
+    // {
+    //   title: "Inventory",
+    //   url: "#",
+    //   items: [
+    //     {
+    //       title: "Full Menu",
+    //       url: "#",
+    //     },
+    //     {
+    //       title: "Stock Levels",
+    //       url: "#",
+    //     },
+    //     {
+    //       title: "Reports",
+    //       url: "#",
+    //     },
+    //   ],
+    // },
+    // {
+    //   title: "Staff",
+    //   url: "#",
+    //   items: [
+    //     {
+    //       title: "Staff Management",
+    //       url: "/userManagement",
+    //     },
+    //     {
+    //       title: "Roles &  Permissions",
+    //       url: "#",
+    //     },
+    //   ],
+    // },
   ],
 };
 
 
-const AppSidebar = ({ ...props }: React.ComponentProps<typeof Sidebar>) => {
+const RestaurantSidebar = ({ ...props }: React.ComponentProps<typeof Sidebar>) => {
   
   return (
     <Sidebar {...props}>
       <SidebarHeader>
         <span className="font-bold capitalize">jasglynn</span>
-        <VersionSwitcher versions={data.versions} defaultVersion={data.versions[0]}  />
       </SidebarHeader>
       <SidebarContent>
         {data.navMain.map((item, index) => (
@@ -138,4 +131,4 @@ const AppSidebar = ({ ...props }: React.ComponentProps<typeof Sidebar>) => {
   );
 };
 
-export default AppSidebar;
+export default RestaurantSidebar;

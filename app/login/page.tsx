@@ -5,6 +5,7 @@ import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import React, { useState } from "react";
 import { SubmitButton } from "./submit-button";
+import Link from "next/link";
 
 // const Login = ({ searchParams }: { searchParams: { message: string } }) => {
 
@@ -71,7 +72,9 @@ const Login = () => {
         </form>
         <div>
           {!sign ?
-          <span className="font-thin underline text-sm">forgot Password?</span>:
+          <Link href={"/forgot-password"}>
+          <span className="font-thin underline text-sm">forgot Password?</span>
+          </Link>:
           ''
           }
         </div>
