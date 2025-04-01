@@ -1,5 +1,6 @@
+"use client"
 import { Card, CardContent } from "@/components/ui/card";
-import React from "react";
+import React, { useContext } from "react";
 import { IoEllipsisVerticalOutline, IoPrintOutline, IoWalletOutline } from "react-icons/io5";
 import { MdOutlineBalance } from "react-icons/md";
 import { BsCashCoin } from "react-icons/bs";
@@ -7,6 +8,8 @@ import { BsBank } from "react-icons/bs";
 import { TransactionTable } from "@/components/table";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { OrderContext } from "@/context/order-context";
+
 const financialActivities = [
   { title: "transfers via wallet", amount: 3000, icon: <IoWalletOutline /> },
   { title: "overall balance", amount: 3000, icon: <MdOutlineBalance /> },
@@ -15,10 +18,15 @@ const financialActivities = [
 ];
 
 export default function Orders() {
+  const {orders} = useContext(OrderContext)
+
   return (
     <div className="space-y-8">
       <h1  className="text-xl font-bold px-4 pt-4 .mb-4">Financial Activities</h1>
       {/* top pane */}
+
+      <div>{orders.length} orders</div>;
+
       <div className=" space-y-4 flex flex-wrap justify-center">
         {financialActivities.map((activity, index) => (
           <div key={index} className=".space-y-4 w-full md:w-1/2 lg:w-1/3 xl:w-1/4 px-4">

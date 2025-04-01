@@ -15,11 +15,14 @@ import food from "@/public/food.png";
 import OrderSummary from "@/components/order-summary";
 // import { cookies } from "next/headers";
 import { createClient } from "@/lib/supabase/server";
-
+import Menulist from "@/components/menulist";
 
 export default async function Restaurant() {
+
   // fetch menu from supabase  table
-  // later add RLS or authorization to it 
+  // later add RLS or authorization to it
+
+  // const { open, toggleOrder } = React.useContext(OrderContext);
 
   const supabase = await createClient();
   const { data: menu, error } = await supabase.from("menu").select("*");
@@ -29,7 +32,6 @@ export default async function Restaurant() {
     return <div>Failed to load menu.</div>;
   }
 
-  // console.log(menu);
 
   return (
     <div className="flex flex-col space-y-8">
@@ -37,6 +39,12 @@ export default async function Restaurant() {
       {/* main pane */}
       <div className="flex space-y-8 .border w-full">
         <div className="px-4 space-y-4  w-full">
+          <div className="flex space-x-4">
+
+            <Button> new order</Button>
+             
+            <Button>existing orders</Button>
+          </div>
           <Tabs defaultValue="menu" className=".w-[400px] space-y-4">
             <TabsList className=" grid grid-cols-4 w-full md:w-1/2 ">
               <TabsTrigger value="menu" className="font-bold">
@@ -53,7 +61,8 @@ export default async function Restaurant() {
               </TabsTrigger>
             </TabsList>
             <TabsContent value="menu" className="">
-              <Card className="">
+              <Menulist menu={menu} />
+              {/* <Card className="">
                 <CardHeader>
                   <CardTitle>Menu List</CardTitle>
                   <CardDescription>
@@ -97,7 +106,7 @@ export default async function Restaurant() {
                       </div>
                     ))}
                 </CardContent>
-              </Card>
+              </Card> */}
             </TabsContent>
             <TabsContent value="appetizers">
               <Card>
@@ -214,12 +223,11 @@ export default async function Restaurant() {
           </Tabs>
         </div>
         {/* pop-up right pane */}
-        <div className="pt-4 space-y-4 ">
-          <h1 className="text-xl font-bold">Order Summary &#40;total&#41;</h1>
-          <div className="border w-[400px] ">
+        {/* <div className="pt-4 space-y-4 ">
+          <Card className="border w-[400px] ">
             <OrderSummary />
-          </div>
-        </div>
+          </Card>
+        </div> */}
       </div>
     </div>
   );
