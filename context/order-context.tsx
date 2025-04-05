@@ -3,7 +3,7 @@ import { supabase } from "@/lib/supabase/clients";
 import { createContext, useEffect, useState } from "react";
 
 // Define the Order interface
-interface Order {
+export interface Order {
   id?: number; // Assuming Supabase uses numeric IDs
   created_at?: string;
   order_id: number;
@@ -17,8 +17,10 @@ interface Order {
 
 interface OrderContext {
   open: boolean;
+  openEditOrder: boolean;
   orders: Order[];
   toggleOrder:()=> void;
+  toggleEditOrder:()=> void;
   createOrder: (order: omit<Order, "id" | "created_at">) => void;
   updateOrder: (id: number, order: Partial<Order>) => void;
   deleteOrder: (id: number) => void;
@@ -29,6 +31,7 @@ export const OrderContext = createContext<OrderContext | null>(null);
 export const OrderProvider = ({ children }: { children: React.ReactNode }) => {
   const [orders, setOrders] = useState<Order[]>([]);
   const [open, setOpen] = useState(false);
+  const [openEditOrder, setopenEditOrder] = useState(false);
 
   // Fetch orders on mount and set up real-time subscription
   useEffect(() => {
@@ -77,6 +80,10 @@ export const OrderProvider = ({ children }: { children: React.ReactNode }) => {
   //toggle order
   const toggleOrder = () => {
     setOpen(!open);
+  };
+
+  const toggleEditOrder = () => {
+    setopenEditOrder(!openEditOrder);
   };
 
   // Create a new order
@@ -131,7 +138,7 @@ export const OrderProvider = ({ children }: { children: React.ReactNode }) => {
 
   return (
     <OrderContext.Provider
-      value={{ open, orders, toggleOrder, createOrder, updateOrder, deleteOrder }}
+      value={{ open, openEditOrder, orders, toggleOrder, toggleEditOrder, createOrder, updateOrder, deleteOrder }}
     >
       {children}
     </OrderContext.Provider>

@@ -18,16 +18,40 @@ import OrderSummary from "@/components/order-summary";
 import { MenuItem } from "@/lib/utils";
 import Menulist from "./menulist";
 import { useContext } from "react";
-import { OrderContext } from "@/context/order-context";
+import { Order, OrderContext } from "@/context/order-context";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "./ui/dialog";
+
+import {
+  Table,
+  TableBody,
+  TableCaption,
+  TableCell,
+  TableFooter,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "./ui/table";
+
 
 export default function RestaurantClient({ menu }: { menu: MenuItem[] }) {
   //@ts-ignore
-  const { open, toggleOrder, createOrder,orders } = useContext(OrderContext);
+  const { open, openEditOrder, toggleOrder, toggleEditOrder, createOrder, orders } = useContext(OrderContext);
   const [selectedItems, setSelectedItems] = useState<MenuItem[]>([]); // Track items in the new order
 
-  // handleExistingOrders = (orders: Order[]) => {
-  //   console.log("existing orders");
-  // }
+  const handleExistingOrders = () => {
+    //close the table //open the exact id or row clicked
+    
+    toggleEditOrder();
+
+  }
 
   const handleItemClick = (item: MenuItem) => {
     setSelectedItems((prev) => {
@@ -88,7 +112,6 @@ export default function RestaurantClient({ menu }: { menu: MenuItem[] }) {
       action: "new",
     };
 
-    
     console.log("Submitting order:", order); // Log the order before sending
     createOrder(order)
       .then(() => {
@@ -97,7 +120,6 @@ export default function RestaurantClient({ menu }: { menu: MenuItem[] }) {
         toggleOrder();
       })
       .catch((err) => console.error("Failed to create order:", err));
-
   };
 
   const handleCancelOrder = () => {
@@ -105,29 +127,76 @@ export default function RestaurantClient({ menu }: { menu: MenuItem[] }) {
     toggleOrder(); // Close the order pane
   };
 
+
   return (
     <div className="flex space-y-8 w-full">
       <div className="px-4 space-y-4  w-full">
         <div className="flex space-x-4">
           <Button onClick={toggleOrder}>New Order</Button>
+          {/* existing orders button */}
+          <Dialog>
 
-          <Button>existing orders</Button>
-          <Button
-  onClick={async () => {
-    const testOrder = {
-      order_id: Date.now(),
-      customer_name: "Test User",
-      table_number: null,
-      items: "Test Item (x1)",
-      total: 10.5,
-      status: "pending",
-      action: "new",
-    };
-    await createOrder(testOrder);
-  }}
->
-  Test Insert
-</Button>
+            <DialogTrigger asChild>
+              <Button variant={"default"}>Existing Orders</Button>
+            </DialogTrigger>
+            <DialogContent className="">
+              <DialogHeader>
+                <DialogTitle>Existing Orders</DialogTitle>
+                <DialogDescription>
+                  View all existing orders in the system
+                </DialogDescription>
+              </DialogHeader>
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead className="w-[100px]">Order ID</TableHead>
+                    <TableHead>Name </TableHead>
+                    <TableHead>Status</TableHead>
+                    <TableHead className="text-right">Amount</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                
+                  {orders.map((order: Order) => (
+                    // make sure the dialog close itself upon selecting a row
+                    <TableRow key={order.id} onClick={() => handleExistingOrders()}>
+                      <TableCell className="font-medium">
+                        {order.order_id}
+                      </TableCell>
+                      <TableCell>{order.customer_name}</TableCell>
+                      <TableCell>{order.status}</TableCell>
+                      <TableCell className="text-right">
+                        {order.total}
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+                {/* <TableFooter>
+                  <TableRow>
+                    <TableCell colSpan={3}>Total</TableCell>
+                    <TableCell className="text-right">$2,500.00</TableCell>
+                  </TableRow>
+                </TableFooter> */}
+              </Table>
+            </DialogContent>
+          </Dialog>
+
+          {/* <Button
+            onClick={async () => {
+              const testOrder = {
+                order_id: Date.now(),
+                customer_name: "Test User",
+                table_number: null,
+                items: "Test Item (x1)",
+                total: 10.5,
+                status: "pending",
+                action: "new",
+              };
+              await createOrder(testOrder);
+            }}
+          >
+            Test Insert
+          </Button> */}
         </div>
         <Tabs defaultValue="menu" className=".w-[400px] space-y-4">
           <TabsList className=" grid grid-cols-4 w-full md:w-1/2 ">
@@ -145,7 +214,11 @@ export default function RestaurantClient({ menu }: { menu: MenuItem[] }) {
             </TabsTrigger>
           </TabsList>
           <TabsContent value="menu" className="">
-            <Menulist menu={menu} onItemClick={handleItemClick} handleDecreaseQuantity={handleDecreaseQuantity} handleIncreaseQuantity={handleIncreaseQuantity} 
+            <Menulist
+              menu={menu}
+              onItemClick={handleItemClick}
+              handleDecreaseQuantity={handleDecreaseQuantity}
+              handleIncreaseQuantity={handleIncreaseQuantity}
             />
           </TabsContent>
           <TabsContent value="appetizers">
@@ -278,7 +351,9 @@ export default function RestaurantClient({ menu }: { menu: MenuItem[] }) {
       {open && (
         <div className="border pt-4 space-y-4">
           <Card className="border w-[400px] p-4">
-            <div className="flex justify-end" ><IoMdClose  onClick={handleCancelOrder} /></div>
+            <div className="flex justify-end">
+              <IoMdClose onClick={handleCancelOrder} />
+            </div>
             <h2 className="text-lg flex justify-center font-bold">
               Jasglynn Bar
             </h2>
@@ -286,7 +361,7 @@ export default function RestaurantClient({ menu }: { menu: MenuItem[] }) {
               <p>No items selected</p>
             ) : (
               <>
-              <div className="py-4 flex justify-center">#orderId</div>
+                <div className="py-4 flex justify-center">#orderId</div>
                 <div className="text-xs font-semibold flex justify-between ">
                   <p>Item</p>
                   <p>Qty</p>
@@ -300,22 +375,27 @@ export default function RestaurantClient({ menu }: { menu: MenuItem[] }) {
                     <li key={index} className="flex justify-between">
                       <div className="flex items-center">{item.name}</div>
                       <div className="flex space-x-2 ">
-                      <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => handleDecreaseQuantity(item.id)}>
-                            -
-                          </Button>
-                        <div className="flex items-center" >x{item.quantity}</div>
                         <Button
                           variant="outline"
                           size="sm"
-                          onClick={() => handleIncreaseQuantity(item.id)}>
-                            +
-                          </Button>
-
+                          onClick={() => handleDecreaseQuantity(item.id)}
+                        >
+                          -
+                        </Button>
+                        <div className="flex items-center">
+                          x{item.quantity}
                         </div>
-                      <div className="flex items-center">GHC {item.price * item.quantity}</div>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => handleIncreaseQuantity(item.id)}
+                        >
+                          +
+                        </Button>
+                      </div>
+                      <div className="flex items-center">
+                        GHC {item.price * item.quantity}
+                      </div>
                     </li>
                   ))}
                 </ul>
@@ -343,6 +423,108 @@ export default function RestaurantClient({ menu }: { menu: MenuItem[] }) {
           </Card>
           <OrderSummary selectedItems={selectedItems} />
         </div>
+      )}
+      {openEditOrder && (
+        <div className="border pt-4 space-y-4">
+          <Card className="border w-[400px] p-4">
+            <div className="flex justify-end">
+              <IoMdClose onClick={toggleEditOrder} />
+            </div>
+            <h2 className="text-lg flex justify-center font-bold">
+              Jasglynn Bar
+            </h2>
+            {selectedItems.length === 0 ? (
+              <p>No items selected</p>
+            ) : (
+              <>
+                <div className="py-4 flex justify-center">#orderId</div>
+                <div className="text-xs font-semibold flex justify-between ">
+                  <p>Item</p>
+                  <p>Qty</p>
+                  {/* <p>
+                Price 
+                </p> */}
+                  <p>Amt</p>
+                </div>
+                <ul>
+                  {selectedItems.map((item, index) => (
+                    <li key={index} className="flex justify-between">
+                      <div className="flex items-center">{item.name}</div>
+                      <div className="flex space-x-2 ">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => handleDecreaseQuantity(item.id)}
+                        >
+                          -
+                        </Button>
+                        <div className="flex items-center">
+                          x{item.quantity}
+                        </div>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => handleIncreaseQuantity(item.id)}
+                        >
+                          +
+                        </Button>
+                      </div>
+                      <div className="flex items-center">
+                        GHC {item.price * item.quantity}
+                      </div>
+                    </li>
+                  ))}
+                  {/* {selectedItems.map((item, index) => (
+                    <li key={index} className="flex justify-between">
+                      <div className="flex items-center">{item.name}</div>
+                      <div className="flex space-x-2 ">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => handleDecreaseQuantity(item.id)}
+                        >
+                          -
+                        </Button>
+                        <div className="flex items-center">
+                          x{item.quantity}
+                        </div>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => handleIncreaseQuantity(item.id)}
+                        >
+                          +
+                        </Button>
+                      </div>
+                      <div className="flex items-center">
+                        GHC {item.price * item.quantity}
+                      </div>
+                    </li>
+                  ))} */}
+                </ul>
+              </>
+            )}
+
+            <div className="flex justify-between font-semibold border-t pt-2">
+              <span>Service Fee</span>
+              {/* <span>GHC{serviceFee.toFixed(2)}</span> */}
+            </div>
+
+            <div className="flex justify-between font-bold border-t pt-2">
+              <span>Total</span>
+              {/* <span>GHC{total.toFixed(2)}</span> */}
+            </div>
+
+            <div className="flex justify-between w-full ">
+              <Button onClick={handleSubmitOrder} className="mt-4">
+                Save Order
+              </Button>
+              <Button onClick={handleSubmitOrder} className="mt-4">
+                Proceed to CheckOut
+              </Button>
+            </div>
+          </Card>
+                </div>
       )}
       {/* {open && (
         <div className="pt-4 space-y-4 ">
