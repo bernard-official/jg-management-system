@@ -10,7 +10,9 @@ export interface MenuItem {
   id: string;
   name: string;
   price: number;
+  description: string;
   category?: string; // Optional field
+  quantity: number
 }
 
 // types/order.ts
@@ -29,4 +31,5 @@ export type Order = {
   status: "pending" | "preparing" | "completed" | "cancelled";
   created_at: string;
   total: number;
+  action: string
 };

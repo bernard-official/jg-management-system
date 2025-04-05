@@ -19,7 +19,7 @@ interface OrderContext {
   open: boolean;
   orders: Order[];
   toggleOrder:()=> void;
-  createOrder: (order: Omit<Order, "id" | "created_at">) => void;
+  createOrder: (order: omit<Order, "id" | "created_at">) => void;
   updateOrder: (id: number, order: Partial<Order>) => void;
   deleteOrder: (id: number) => void;
 }
@@ -28,7 +28,7 @@ export const OrderContext = createContext<OrderContext | null>(null);
 
 export const OrderProvider = ({ children }: { children: React.ReactNode }) => {
   const [orders, setOrders] = useState<Order[]>([]);
-  const [open, setOpen] = useState(true);
+  const [open, setOpen] = useState(false);
 
   // Fetch orders on mount and set up real-time subscription
   useEffect(() => {
@@ -86,7 +86,12 @@ export const OrderProvider = ({ children }: { children: React.ReactNode }) => {
       .insert([order])
       .select();
     if (error) {
-      console.error("Error creating order:", error);
+      console.error("Error creating order:", {
+        message: error.message,
+        code: error.code,
+        details: error.details,
+        hint: error.hint,
+      });
     } else if (data && data.length > 0) {
       setOrders((prevOrders) => {
         // Avoid duplicates if real-time already added it
