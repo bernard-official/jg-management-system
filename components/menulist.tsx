@@ -10,7 +10,6 @@ import Image from "next/image";
 import cleardrink from "@/public/cleardrink.png";
 import food from "@/public/food.png";
 import { MenuItem } from "@/lib/utils";
-import { Button } from "./ui/button";
 
 interface MenulistProps {
   menu: MenuItem[];
@@ -19,8 +18,10 @@ interface MenulistProps {
   handleIncreaseQuantity?: (itemId: number) => void;
 }
 
-function Menulist({menu, onItemClick, handleDecreaseQuantity, handleIncreaseQuantity }: MenulistProps) {
-
+function Menulist({
+  menu,
+  onItemClick,
+}: MenulistProps) {
   return (
     <>
       <Card className="">
@@ -40,8 +41,7 @@ function Menulist({menu, onItemClick, handleDecreaseQuantity, handleIncreaseQuan
           <h2 className=" font-semibold underline">Dishes</h2>
           {menu
             .filter((item) => item.category !== "Drinks")
-            .map((item:MenuItem ) => (
-
+            .map((item: MenuItem) => (
               <div
                 key={item.id}
                 className="flex w-full items-center justify-between space-y-1
@@ -50,11 +50,9 @@ function Menulist({menu, onItemClick, handleDecreaseQuantity, handleIncreaseQuan
               >
                 <div>{item.name}</div>
                 <div className="flex item-center space-x-1">
-                <div className="flex item center">GHC{item.price}</div>
+                  <div className="flex item center">GHC{item.price}</div>
 
-                <div className="hover">
-               
-                </div>
+                  <div className="hover"></div>
                 </div>
               </div>
             ))}
@@ -75,11 +73,7 @@ function Menulist({menu, onItemClick, handleDecreaseQuantity, handleIncreaseQuan
               >
                 <div>{item.name}</div>
                 <div className="flex item-center space-x-8">
-                <div className=" flex item-center">GHC{item.price}</div>
-
-                <div className="hover">
-                
-                </div>
+                  <div className=" flex item-center">GHC{item.price}</div>
                 </div>
               </div>
             ))}

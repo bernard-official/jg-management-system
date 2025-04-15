@@ -15,13 +15,13 @@ export interface Order {
   action: string;
 }
 
-interface OrderContext {
+export interface OrderContext {
   open: boolean;
   openEditOrder: boolean;
   orders: Order[];
   toggleOrder:()=> void;
   toggleEditOrder:()=> void;
-  createOrder: (order: omit<Order, "id" | "created_at">) => void;
+  createOrder: (order: Omit<Order, "id" | "created_at">) => void;
   updateOrder: (id: number, order: Partial<Order>) => void;
   deleteOrder: (id: number) => void;
 }

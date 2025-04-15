@@ -1,6 +1,6 @@
+import React from "react";
 import { OrderContext } from "@/context/order-context";
 import { createClient } from "@/lib/supabase/server";
-import React from "react";
 import { useContext } from "react";
 
 const supabase = await createClient();
