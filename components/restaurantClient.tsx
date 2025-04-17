@@ -215,6 +215,136 @@ export default function RestaurantClient({ menu }: { menu: MenuItem[] }) {
     }
   };
 
+  const handleCheckout = async (isEditOrder: boolean) => {
+    if (!isEditOrder && selectedItems.length === 0) return;
+    if (isEditOrder && !selectedEditedItemId) return;
+
+    let orderToPrint: Order;
+
+    if (isEditOrder) {
+      const allItems = [
+        ...editedOrderItems.map((item) => `${item.name} (x${item.quantity})`),
+        ...selectedItems.map((item) => `${item.name} (x${item.quantity || 1})`),
+      ].join(", ");
+
+      const total = [
+        ...editedOrderItems.map((item) => {
+          const menuItem = menu.find((m) => m.name === item.name);
+          return menuItem ? menuItem.price * item.quantity : 0;
+        }),
+        selectedItems.reduce(
+          (sum, item) => sum + item.price * (item.quantity || 1),
+          0
+        ),
+      ].reduce((sum, val) => sum + val, 0) + serviceFee;
+
+      const updatedOrder = {
+        items: allItems,
+        total,
+        status: "completed",
+        customer_name: selectedEditedItemId.customer_name,
+        table_number: selectedEditedItemId.table_number,
+        action: "completed",
+      };
+
+      try {
+        await updateOrder(selectedEditedItemId.id!, updatedOrder);
+        orderToPrint = { ...selectedEditedItemId, ...updatedOrder };
+        console.log("Order checked out successfully");
+      } catch (err) {
+        console.error("Failed to checkout order:", err);
+        return;
+      }
+    } else {
+      const order = {
+        order_id: Date.now(),
+        customer_name: "Guest",
+        table_number: null,
+        item: selectedItems
+          .map((i) => `${i.name} (x${i.quantity || 1})`)
+          .join(", "),
+        total,
+        status: "completed",
+        action: "completed",
+      };
+
+      try {
+        await createOrder(order);
+        orderToPrint = order;
+        console.log("Order checked out successfully");
+      } catch (err) {
+        console.error("Failed to checkout order:", err);
+        return;
+      }
+    }
+
+    // Trigger print
+    const printWindow = window.open("", "_blank");
+    if (printWindow) {
+      printWindow.document.write(`
+        <html>
+          <head>
+            <title>Order Receipt</title>
+            <style>
+              body { font-family: Arial, sans-serif; padding: 20px; }
+              h1 { text-align: center; }
+              .receipt { max-width: 300px; margin: 0 auto; }
+              .items { width: 100%; border-collapse: collapse; }
+              .items th, .items td { padding: 5px; border-bottom: 1px solid #ddd; }
+              .total { font-weight: bold; margin-top: 10px; }
+            </style>
+          </head>
+          <body>
+            <div class="receipt">
+              <h1>Jasglynn Bar</h1>
+              <p>Order #${orderToPrint.order_id}</p>
+              <p>Customer: ${orderToPrint.customer_name}</p>
+              <p>Date: ${new Date().toLocaleDateString()}</p>
+              <table class="items">
+                <tr>
+                  <th>Item</th>
+                  <th>Qty</th>
+                  <th>Price</th>
+                </tr>
+                ${parseOrderItems(orderToPrint.items)
+                  .map(
+                    (item) => `
+                  <tr>
+                    <td>${item.name}</td>
+                    <td>${item.quantity}</td>
+                    <td>GHC ${(getItemPrice(item.name) * item.quantity).toFixed(2)}</td>
+                  </tr>
+                `
+                  )
+                  .join("")}
+              </table>
+              <div class="total">
+                <p>Service Fee: GHC ${serviceFee.toFixed(2)}</p>
+                <p>Total: GHC ${orderToPrint.total.toFixed(2)}</p>
+              </div>
+            </div>
+            <script>
+              window.onload = () => {
+                window.print();
+                setTimeout(() => window.close(), 100);
+              };
+            </script>
+          </body>
+        </html>
+      `);
+      printWindow.document.close();
+    }
+
+    setSelectedItems([]);
+    setEditedOrderItems([]);
+    setSelectedEditedItemId(null);
+    if (isEditOrder) {
+      toggleEditOrder();
+    } else {
+      toggleOrder();
+    }
+  };
+
   const handleCancelOrder = () => {
     setSelectedItems([]);
     toggleOrder();
@@ -242,7 +372,7 @@ export default function RestaurantClient({ menu }: { menu: MenuItem[] }) {
                     <TableHead className="w-[100px]">Order ID</TableHead>
                     <TableHead>Name</TableHead>
                     <TableHead>Status</TableHead>
-                    <TableHead className="text-right">Amount</TableHead>
+                    <TableHead className=".text-right">Amount</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -254,7 +384,7 @@ export default function RestaurantClient({ menu }: { menu: MenuItem[] }) {
                       <TableCell className="font-medium">{order.order_id}</TableCell>
                       <TableCell>{order.customer_name}</TableCell>
                       <TableCell>{order.status}</TableCell>
-                      <TableCell className="text-right">{order.total}</TableCell>
+                      <TableCell className=".text-right">GHC {order.total}</TableCell>
                     </TableRow>
                   ))}
                 </TableBody>
@@ -415,7 +545,7 @@ export default function RestaurantClient({ menu }: { menu: MenuItem[] }) {
                   <Button onClick={handleSubmitOrder} className="mt-4">
                     Save Order
                   </Button>
-                  <Button onClick={handleSubmitOrder} className="mt-4">
+                  <Button onClick={() => handleCheckout(false)} className="mt-4">
                     Proceed to CheckOut
                   </Button>
                 </div>
@@ -524,7 +654,7 @@ export default function RestaurantClient({ menu }: { menu: MenuItem[] }) {
                   <Button onClick={handleUpdateOrder} className="mt-4">
                     Save Order
                   </Button>
-                  <Button onClick={handleSubmitOrder} className="mt-4">
+                  <Button onClick={() => handleCheckout(true)} className="mt-4">
                     Proceed to CheckOut
                   </Button>
                 </div>

@@ -9,7 +9,7 @@ export interface Order {
   order_id: number;
   customer_name: string;
   table_number: number | null;
-  item: string;
+  items: string;
   total: number;
   status: "pending" | "preparing" | "completed" | "cancelled";
   action: string;
