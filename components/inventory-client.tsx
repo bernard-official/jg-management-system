@@ -1,105 +1,146 @@
-'use client'
+"use client";
 
-import React, { useContext, useState } from 'react'
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from './ui/dialog';
-import { Button } from './ui/button';
-import { Input } from './ui/input';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from './ui/table';
-import { InventoryContext } from '@/context/inventory-context';
+import React, { useContext, useState } from "react";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "./ui/dialog";
+import { Button } from "./ui/button";
+import { Input } from "./ui/input";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "./ui/table";
+import { InventoryContext } from "@/context/inventory-context";
 
-export  const InventoryClient = () => {
-    const { inventory, addProduct, restockItem } = useContext(InventoryContext)!;
-    const [restockQuantities, setRestockQuantities] = useState<{ [key: number]: number }>({});
+export const InventoryClient = () => {
+  const { inventory, addProduct, restockItem } = useContext(InventoryContext)!;
+  const [restockQuantities, setRestockQuantities] = useState<{
+    [key: number]: number;
+  }>({});
 
-    const [newProduct, setNewProduct] = useState({
+  const [newProduct, setNewProduct] = useState({
+    name: "",
+    price: "",
+    category: "",
+    description: "",
+    initial_stock: "",
+  });
+
+  const handleRestock = async (menu_item_id: number) => {
+    const quantity = restockQuantities[menu_item_id] || 0;
+    if (quantity <= 0) {
+      console.log("Restock quantity must be greater than 0.");
+      return;
+    }
+    try {
+      await restockItem(menu_item_id, quantity);
+      setRestockQuantities((prev) => ({ ...prev, [menu_item_id]: 0 }));
+      console.log(`Restocked item ${menu_item_id} successfully`);
+    } catch (err) {
+      console.error("Failed to restock item:", err);
+    }
+  };
+
+  const handleAddProduct = async (e: React.FormEvent) => {
+    e.preventDefault();
+    try {
+      await addProduct({
+        name: newProduct.name,
+        price: Number(newProduct.price),
+        category: newProduct.category,
+        description: newProduct.description || undefined,
+        initial_stock: Number(newProduct.initial_stock),
+      });
+      console.log("Product added successfully");
+      setNewProduct({
         name: "",
         price: "",
         category: "",
         description: "",
         initial_stock: "",
       });
-    
-    const handleRestock = async (menu_item_id: number) => {
-        const quantity = restockQuantities[menu_item_id] || 0;
-        if (quantity <= 0) {
-          console.log("Restock quantity must be greater than 0.");
-          return;
-        }
-        try {
-          await restockItem(menu_item_id, quantity);
-          setRestockQuantities((prev) => ({ ...prev, [menu_item_id]: 0 }));
-          console.log(`Restocked item ${menu_item_id} successfully`);
-        } catch (err) {
-          console.error("Failed to restock item:", err);
-        }
-      };
-
-    const handleAddProduct = async (e: React.FormEvent) => {
-        e.preventDefault();
-        try {
-          await addProduct({
-            name: newProduct.name,
-            price: Number(newProduct.price),
-            category: newProduct.category,
-            description: newProduct.description || undefined,
-            initial_stock: Number(newProduct.initial_stock),
-          });
-          console.log("Product added successfully");
-          setNewProduct({ name: "", price: "", category: "", description: "", initial_stock: "" });
-        } catch (err) {
-          console.error("Error adding product:", err);
-        }
-      };
+    } catch (err) {
+      console.error("Error adding product:", err);
+    }
+  };
   return (
-    <div className="p-4">
-    <Dialog>
-      <DialogTrigger asChild>
-        <Button variant="default">Manage Inventory</Button>
-      </DialogTrigger>
-      <DialogContent>
-        <DialogHeader>
-          <DialogTitle>Inventory Management</DialogTitle>
-          <DialogDescription>View and manage stock levels for menu items</DialogDescription>
-        </DialogHeader>
-        <form onSubmit={handleAddProduct} className="space-y-4 mb-4">
-          <Input
-            placeholder="Product Name"
-            value={newProduct.name}
-            onChange={(e) => setNewProduct({ ...newProduct, name: e.target.value })}
-            required
-          />
-          <Input
-            type="number"
-            placeholder="Price"
-            value={newProduct.price}
-            onChange={(e) => setNewProduct({ ...newProduct, price: e.target.value })}
-            required
-          />
-          <Input
-            placeholder="Category"
-            value={newProduct.category}
-            onChange={(e) => setNewProduct({ ...newProduct, category: e.target.value })}
-            required
-          />
-          <Input
-            placeholder="Description (optional)"
-            value={newProduct.description}
-            onChange={(e) => setNewProduct({ ...newProduct, description: e.target.value })}
-          />
-          <Input
-            type="number"
-            placeholder="Initial Stock"
-            value={newProduct.initial_stock}
-            onChange={(e) => setNewProduct({ ...newProduct, initial_stock: e.target.value })}
-            required
-          />
-          <Button type="submit">Add New Product</Button>
-        </form>
+    <div className="flex space-y-8 w-full ">
+      <div className="px-4 space-y-4 w-full ">
+        <Dialog>
+          <DialogTrigger asChild>
+            <Button variant="default">+ Add Stock</Button>
+          </DialogTrigger>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Inventory Management</DialogTitle>
+              <DialogDescription>
+                View and manage stock levels for menu items
+              </DialogDescription>
+            </DialogHeader>
+            <form onSubmit={handleAddProduct} className="space-y-4 mb-4">
+              <Input
+                placeholder="Product Name"
+                value={newProduct.name}
+                onChange={(e) =>
+                  setNewProduct({ ...newProduct, name: e.target.value })
+                }
+                required
+              />
+              <Input
+                type="number"
+                placeholder="Price"
+                value={newProduct.price}
+                onChange={(e) =>
+                  setNewProduct({ ...newProduct, price: e.target.value })
+                }
+                required
+              />
+              <Input
+                placeholder="Category"
+                value={newProduct.category}
+                onChange={(e) =>
+                  setNewProduct({ ...newProduct, category: e.target.value })
+                }
+                required
+              />
+              <Input
+                placeholder="Description (optional)"
+                value={newProduct.description}
+                onChange={(e) =>
+                  setNewProduct({ ...newProduct, description: e.target.value })
+                }
+              />
+              <Input
+                type="number"
+                placeholder="Initial Stock"
+                value={newProduct.initial_stock}
+                onChange={(e) =>
+                  setNewProduct({
+                    ...newProduct,
+                    initial_stock: e.target.value,
+                  })
+                }
+                required
+              />
+              <Button type="submit">Add New Product</Button>
+            </form>
+          </DialogContent>
+        </Dialog>
+
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>Item</TableHead>
               <TableHead>Stock</TableHead>
+              <TableHead>Quantity</TableHead>
               <TableHead>Low Stock Threshold</TableHead>
               <TableHead>Restock</TableHead>
             </TableRow>
@@ -130,7 +171,10 @@ export  const InventoryClient = () => {
                       placeholder="Qty"
                       className="w-20"
                     />
-                    <Button onClick={() => handleRestock(item.menu_item_id)} size="sm">
+                    <Button
+                      onClick={() => handleRestock(item.menu_item_id)}
+                      size="sm"
+                    >
                       Restock
                     </Button>
                   </div>
@@ -139,8 +183,7 @@ export  const InventoryClient = () => {
             ))}
           </TableBody>
         </Table>
-      </DialogContent>
-    </Dialog>
-  </div>
-  )
-}
+      </div>
+    </div>
+  );
+};
