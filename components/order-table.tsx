@@ -15,6 +15,7 @@ import { AiOutlineTable } from "react-icons/ai";
 import { Order } from "@/context/order-context";
 import { CiCalendarDate } from "react-icons/ci";
 import { GoStack } from "react-icons/go";
+import { HoverCard, HoverCardContent, HoverCardTrigger } from "./ui/hover-card";
 // import { useContext } from "react";
 
 export function OrderTable({ orders }: { orders: Order }) {
@@ -22,7 +23,8 @@ export function OrderTable({ orders }: { orders: Order }) {
 
   return (
     <>
-      <Table className="border">
+    <div className="border rounded-md  max-h-[500px] overflow-auto ">
+      <Table className=" ">
         <TableHeader>
           <TableRow>
             <TableHead className="w-[100px]"># Order ID</TableHead>
@@ -35,7 +37,7 @@ export function OrderTable({ orders }: { orders: Order }) {
             <TableHead>
               <div className="flex  flex-row items-center space-x-2">
                 <AiOutlineTable />
-                <h4>Table number</h4>
+                <h4>Table No.</h4>
               </div>
             </TableHead>
             <TableHead>
@@ -72,25 +74,55 @@ export function OrderTable({ orders }: { orders: Order }) {
             {/* <TableHead className="flex items-center space-x-2 "><HiOutlineCalendarDateRange />fulfilment</TableHead> */}
           </TableRow>
         </TableHeader>
-        <TableBody>
-          {orders.map((order: Order) => (
-            <TableRow
-              key={order.id}
-              //   onClick={() => handleExistingOrders(order.id!)}
-            >
-              <TableCell className=".font-medium">{order.order_id}</TableCell>
-              <TableCell>{order.customer_name}</TableCell>
-              <TableCell>{order.table_number}</TableCell>
-              <TableCell className=".text-right">GHC {order.total}</TableCell>
-              <TableCell>{order.status}</TableCell>
-              <TableCell className=".text-right">{order.item}</TableCell>
-              <TableCell>{order.created_at}</TableCell>
-              {/* <TableCell>Payment</TableCell>
+        <TableBody className="overflow-auto">
+          {orders.map((order: Order) => {
+            const statusColor = () => {
+              switch (order.status) {
+                case "pending":
+                  return "orange";
+                case "preparing":
+                  return "blue";
+                case "completed":
+                  return "green";
+                default:
+                  return "red";
+              }
+            };
+            return (
+              <TableRow
+                key={order.id}
+                //   onClick={() => handleExistingOrders(order.id!)}
+              >
+                <TableCell className=".font-medium">{order.order_id}</TableCell>
+                <TableCell>{order.customer_name}</TableCell>
+                <TableCell>{order.table_number}</TableCell>
+                <TableCell className=".text-right">GHC {order.total}</TableCell>
+                <TableCell>
+                  <p
+                    className={`border rounded-md flex justify-center p-0 items-center border-${statusColor()}-500 text-${statusColor()}-500`}
+                  >
+                    {order.status}
+                  </p>
+                </TableCell>
+                <TableCell className=".text-orange-500 .text-right">
+                  <HoverCard>
+                    <HoverCardTrigger>
+                      {/* {order.items} */}
+                      {/* {order.items.slice(0, order.items.length - 1).concat('...')}  */}
+                      {order.items.slice(0, 20).concat("...")}
+                    </HoverCardTrigger>
+                    <HoverCardContent>{order.items}</HoverCardContent>
+                  </HoverCard>
+                </TableCell>
+                <TableCell>{order.created_at}</TableCell>
+                {/* <TableCell>Payment</TableCell>
               <TableCell>fulfillment</TableCell> */}
-            </TableRow>
-          ))}
+              </TableRow>
+            );
+          })}
         </TableBody>
       </Table>
+      </div>
     </>
   );
 }

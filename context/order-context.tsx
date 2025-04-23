@@ -31,7 +31,7 @@ export const OrderContext = createContext<OrderContext | null>(null);
 export const OrderProvider = ({ children }: { children: React.ReactNode }) => {
   const [orders, setOrders] = useState<Order[]>([]);
   const [open, setOpen] = useState(false);
-  const [openEditOrder, setopenEditOrder] = useState(false);
+  const [openEditOrder, setOpenEditOrder] = useState(false);
 
   // Fetch orders on mount and set up real-time subscription
   useEffect(() => {
@@ -83,7 +83,7 @@ export const OrderProvider = ({ children }: { children: React.ReactNode }) => {
   };
 
   const toggleEditOrder = () => {
-    setopenEditOrder(!openEditOrder);
+    setOpenEditOrder(!openEditOrder);
   };
 
   // Create a new order

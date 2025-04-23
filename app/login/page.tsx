@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input";
 import React, { useState } from "react";
 import { SubmitButton } from "./submit-button";
 import Link from "next/link";
+import Image from 'next/image'
 
 // const Login = ({ searchParams }: { searchParams: { message: string } }) => {
 
@@ -23,6 +24,9 @@ const Login = () => {
         <form className="space-y-8">
           <div className="flex justify-center">
             <span className="text-2xl font-bold"> JASGLYNN</span>
+          </div>
+          <div className="flex p-0 w-full justify-center">
+            <Image className=" p-0"  src={"/logo.jpg"} alt={"logo"} width={100} height={200} />
           </div>
           {!sign ? (
             <span className=" text-sm ml-8">
@@ -62,12 +66,6 @@ const Login = () => {
                 Sign Up
               </SubmitButton>
             )}
-
-            {/* {searchParams?.message && (
-          <p className="mt-4 p-4 bg-foreground/10 text-foreground text-center">
-            {searchParams.message}
-            </p>
-        )} */}
           </div>
         </form>
         <div>

@@ -12,7 +12,9 @@ export default function Layout({ children }: { children: React.ReactNode }) {
           <SidebarTrigger />
           <Header />
         </div>
-        <main>{children}</main>
+        <main>
+          {children}
+        </main>
       </div>
     </SidebarProvider>
   );

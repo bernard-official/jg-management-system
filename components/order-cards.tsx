@@ -12,7 +12,7 @@ import { Order } from "@/context/order-context";
 const OrderCards = ({orders}:{ orders: Order }) => {
 
     const orderActivities = [
-      { title: "total orders ", amount: 3000, icon: <IoWalletOutline /> },
+      { title: "total orders ", amount: orders.length, icon: <IoWalletOutline /> },
       { title: "orders items over time", amount: 3000, icon: <MdOutlineBalance /> },
       { title: "return orders", amount: 3000, icon: <BsBank /> },
       { title: "furfilled Orders overtime", amount: 3000, icon: <BsCashCoin /> },
@@ -39,7 +39,7 @@ const OrderCards = ({orders}:{ orders: Order }) => {
                 </div>
                 <div className="flex items-center  h-1/2">
                   <span className="text-xl font-extrabold">
-                    GHC {activity.amount}
+                    {orders.length? '' : "GHC"} {activity.amount}
                   </span>
                 </div>
               </CardContent>
