@@ -13,6 +13,7 @@ export interface Order {
   total: number;
   status: "pending" | "preparing" | "completed" | "cancelled";
   action: string;
+  user_id?: string //info about who created the order
 }
 
 export interface OrderContext {

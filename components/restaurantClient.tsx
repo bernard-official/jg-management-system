@@ -408,7 +408,7 @@ export default function RestaurantClient({ menu: initialMenu }: { menu: MenuItem
                   <div className=" h-[60vh] overflow-auto ">
               <Table className=" max-h-96 overflow-x-hidden">
                 {/* <TableHeader className=" .bg-white .sticky .fixed"> */}
-                <TableHeader  >
+                <TableHeader className="sticky top-0 bg-background" >
                   
 
                   <TableRow>
