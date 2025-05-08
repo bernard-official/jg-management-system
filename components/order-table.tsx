@@ -24,8 +24,8 @@ export function OrderTable({ orders }: { orders: Order }) {
   return (
     <>
     <div className="border rounded-md  max-h-[500px] overflow-auto ">
-      <Table className=" ">
-        <TableHeader>
+      <Table >
+        <TableHeader className="sticky top-0 bg-background">
           <TableRow>
             <TableHead className="w-[100px]"># Order ID</TableHead>
             <TableHead>
