@@ -148,7 +148,7 @@ export const InventoryClient = () => {
             <DialogTrigger asChild>
               <Button variant="outline">View Restock History</Button>
             </DialogTrigger>
-            <DialogContent>
+            <DialogContent className="border border-red-500 h-[90vh] w-[95vw] overflow-y-auto">
               <DialogHeader>
                 <DialogTitle>Restock History</DialogTitle>
                 <DialogDescription>
@@ -161,7 +161,8 @@ export const InventoryClient = () => {
                     <TableHead>Item</TableHead>
                     <TableHead>Quantity</TableHead>
                     <TableHead>Date</TableHead>
-                    <TableHead>Staff</TableHead>
+                    <TableHead>Staff Name</TableHead>
+                    <TableHead>Staff ID</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -176,8 +177,8 @@ export const InventoryClient = () => {
                       <TableCell>
                         {new Date(record.restocked_at).toLocaleString()}
                       </TableCell>
-                      {/* <TableCell>{record.created_by || "System"}</TableCell> */}
-                      <TableCell>{record.created_by}</TableCell>
+                      <TableCell>{record.staff_name}</TableCell>
+                      <TableCell>{record.staff_id}</TableCell>
                     </TableRow>
                   ))}
                 </TableBody>

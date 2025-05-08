@@ -16,8 +16,8 @@ export interface RestockHistory {
   menu_item_id: number;
   quantity: number;
   restocked_at: string;
-  created_by?: UUID  ;
-  staff_name?:  string;
+  staff_name: string  ;
+  staff_id:  UUID;
 }
 export interface InventoryContextType {
   inventory: InventoryItem[];
@@ -25,7 +25,7 @@ export interface InventoryContextType {
   restockHistory: RestockHistory[];
   fetchInventory: () => Promise<void>;
   fetchRestockHistory: () => Promise<void>;
-  // restockItem: (menu_item_id: number, quantity: number, created_by?: UUID) => Promise<void>;
+  // restockItem: (menu_item_id: number, quantity: number, staff_name?: UUID) => Promise<void>;
   restockItem: (menu_item_id: number, quantity: number) => Promise<void>;
   addProduct: (product: {
     name: string;
@@ -67,7 +67,7 @@ export const InventoryProvider = ({
       // Verify user is a manager
       const { data: currentUser, error: userError } = await supabase
         .from("users")
-        .select("role")
+        .select("role, full_name")
         .eq("id", user.id)
         .single();
       if (userError || currentUser?.role !== "manager") {
@@ -99,7 +99,8 @@ export const InventoryProvider = ({
         .insert({
           menu_item_id,
           quantity,
-          created_by: user.id, // Use authenticated user's UUID
+          staff_id: user.id, // Use authenticated user's UUID
+          staff_name: currentUser?.full_name, // Use current user fetched from the users table
         });
       if (historyError)
         throw new Error(
@@ -223,17 +224,41 @@ export const InventoryProvider = ({
     }
   };
 
-  const fetchRestockHistory = async () => {
+  // context/inventory-context.tsx
+const fetchRestockHistory = async () => {
+  try {
     const { data, error } = await supabase
       .from("restock_history")
-      .select("*")
+      .select(`
+        id,
+        menu_item_id,
+        quantity,
+        restocked_at,
+        staff_name,
+        staff_id
+      `)
       .order("restocked_at", { ascending: false });
     if (error) {
-      console.error("Error fetching restock history:", error);
-    } else {
-      setRestockHistory(data || []);
+      console.error("Error fetching restock history:", error.message || error);
+      throw new Error(`Failed to fetch restock history: ${error.message || error}`);
     }
-  };
+
+    const formattedData = data?.map((item) => ({
+      id: item.id,
+      menu_item_id: item.menu_item_id,
+      quantity: item.quantity,
+      restocked_at: item.restocked_at,
+      staff_id: item.staff_id,
+      staff_name: item.staff_name,
+    })) || [];
+
+    console.log('Fetched restock history:', formattedData);
+    setRestockHistory(formattedData);
+  } catch (err: any) {
+    console.error("Fetch restock history error:", err.message || err);
+    setRestockHistory([]);
+  }
+};
 
   useEffect(() => {
     fetchInventory();
