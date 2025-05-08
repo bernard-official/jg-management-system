@@ -16,7 +16,7 @@ import OrderCards from "@/components/order-cards";
 
 
 export default function Orders() {
-  const { orders } = useContext(OrderContext);
+  const { orders } = useContext(OrderContext)!;
 
   return (
     <div className="space-y-8">

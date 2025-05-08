@@ -43,7 +43,7 @@ export const updateSession = async (request: NextRequest) => {
     // if (request.nextUrl.pathname.startsWith("/protected") && user.error) {
     //   return NextResponse.redirect(new URL("/sign-in", request.url));
     // }
-    if (request.nextUrl.pathname.startsWith("/dashboard" ) && user.error) {
+    if (request.nextUrl.pathname.startsWith("/dashboard") && user.error) {
       return NextResponse.redirect(new URL("/login", request.url));
     }
 

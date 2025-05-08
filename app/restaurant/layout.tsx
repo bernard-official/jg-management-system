@@ -9,12 +9,14 @@ export default function Layout({ children }: { children: React.ReactNode }) {
     <SidebarProvider>
       {/* <AppSidebar /> */}
       < RestaurantSidebar />
-      <div className="border w-full">
-        <div className="border-b flex items-center space-x-4">
+      <div className="border  w-full">
+        <div className=" sticky top-0 z-50 bg-opacity-100 bg-sidebar-primary-foreground w-full   border-b flex items-center space-x-4">
           <SidebarTrigger />
           <Header />
         </div>
-        <main>{children}</main>
+        <main>
+          {children}
+        </main>
       </div>
     </SidebarProvider>
   );
