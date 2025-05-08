@@ -1,5 +1,6 @@
 "use client";
-import { supabase } from "@/lib/supabase/clients";
+import { supabase } from "@/utils/supabase/clients";
+import { UUID } from "crypto";
 import { createContext, useEffect, useState } from "react";
 
 // Define the Order interface
@@ -13,15 +14,15 @@ export interface Order {
   total: number;
   status: "pending" | "preparing" | "completed" | "cancelled";
   action: string;
-  user_id?: string //info about who created the order
+  user_id?: UUID; //info about who created the order
 }
 
 export interface OrderContext {
   open: boolean;
   openEditOrder: boolean;
   orders: Order[];
-  toggleOrder:()=> void;
-  toggleEditOrder:()=> void;
+  toggleOrder: () => void;
+  toggleEditOrder: () => void;
   createOrder: (order: Omit<Order, "id" | "created_at">) => void;
   updateOrder: (id: number, order: Partial<Order>) => void;
   deleteOrder: (id: number) => void;
@@ -139,7 +140,16 @@ export const OrderProvider = ({ children }: { children: React.ReactNode }) => {
 
   return (
     <OrderContext.Provider
-      value={{ open, openEditOrder, orders, toggleOrder, toggleEditOrder, createOrder, updateOrder, deleteOrder }}
+      value={{
+        open,
+        openEditOrder,
+        orders,
+        toggleOrder,
+        toggleEditOrder,
+        createOrder,
+        updateOrder,
+        deleteOrder,
+      }}
     >
       {children}
     </OrderContext.Provider>

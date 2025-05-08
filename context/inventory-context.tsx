@@ -1,6 +1,7 @@
 "use client";
-import { supabase } from "@/lib/supabase/clients";
+import { supabase } from "@/utils/supabase/clients";
 import { MenuItem } from "@/lib/utils";
+import { UUID } from "crypto";
 import React, { createContext, useState, useEffect } from "react";
 
 export interface InventoryItem {
@@ -15,7 +16,8 @@ export interface RestockHistory {
   menu_item_id: number;
   quantity: number;
   restocked_at: string;
-  created_by?: string;
+  created_by?: UUID  ;
+  staff_name?:  string;
 }
 export interface InventoryContextType {
   inventory: InventoryItem[];
@@ -23,7 +25,8 @@ export interface InventoryContextType {
   restockHistory: RestockHistory[];
   fetchInventory: () => Promise<void>;
   fetchRestockHistory: () => Promise<void>;
-  restockItem: (menu_item_id: number, quantity: number, created_by?: string) => Promise<void>;
+  // restockItem: (menu_item_id: number, quantity: number, created_by?: UUID) => Promise<void>;
+  restockItem: (menu_item_id: number, quantity: number) => Promise<void>;
   addProduct: (product: {
     name: string;
     price: number;
@@ -31,10 +34,14 @@ export interface InventoryContextType {
     description?: string;
     initial_stock: number;
   }) => Promise<void>;
-  deductStock: (items: { menu_item_id: number; quantity: number }[]) => Promise<void>;
+  deductStock: (
+    items: { menu_item_id: number; quantity: number }[]
+  ) => Promise<void>;
 }
 
-export const InventoryContext = createContext<InventoryContextType | null>(null);
+export const InventoryContext = createContext<InventoryContextType | null>(
+  null
+);
 
 export const InventoryProvider = ({
   children,
@@ -45,20 +52,46 @@ export const InventoryProvider = ({
   const [menu, setMenu] = useState<MenuItem[]>([]);
   const [restockHistory, setRestockHistory] = useState<RestockHistory[]>([]);
 
-  const restockItem = async (menu_item_id: number, quantity: number, created_by?: string) => {
+  const restockItem = async (menu_item_id: number, quantity: number) => {
     try {
+      // Get the current authenticated user
+      const {
+        data: { user },
+        error: authError,
+      } = await supabase.auth.getUser();
+      // console.log("Authenticated user:", user);
+      if (authError || !user) {
+        throw new Error("Unauthorized: Please log in to restock items");
+      }
+
+      // Verify user is a manager
+      const { data: currentUser, error: userError } = await supabase
+        .from("users")
+        .select("role")
+        .eq("id", user.id)
+        .single();
+      if (userError || currentUser?.role !== "manager") {
+        throw new Error("Unauthorized: Only managers can restock items");
+      }
+
+      // Update inventory stock
       const { data, error } = await supabase
         .from("inventory")
         .select("stock_quantity")
         .eq("menu_item_id", menu_item_id)
         .single();
-      if (error) throw error;
+      if (error)
+        throw new Error(`Failed to fetch inventory: ${error.message || error}`);
+
       const newQuantity = data.stock_quantity + quantity;
       const { error: updateError } = await supabase
         .from("inventory")
         .update({ stock_quantity: newQuantity })
         .eq("menu_item_id", menu_item_id);
-      if (updateError) throw updateError;
+      if (updateError)
+        throw new Error(
+          `Failed to update inventory: ${updateError.message || updateError}`
+        );
 
       // Log restock to history
       const { error: historyError } = await supabase
@@ -66,16 +99,21 @@ export const InventoryProvider = ({
         .insert({
           menu_item_id,
           quantity,
-          created_by: created_by || "System",
+          created_by: user.id, // Use authenticated user's UUID
         });
-      if (historyError) throw historyError;
+      if (historyError)
+        throw new Error(
+          `Failed to log restock: ${historyError.message || historyError}`
+        );
 
-      console.log(`Restocked ${quantity} units for menu_item_id ${menu_item_id}`);
+      console.log(
+        `Restocked ${quantity} units for menu_item_id ${menu_item_id} by user ${user.id}`
+      );
       fetchInventory();
       fetchRestockHistory();
-    } catch (err) {
-      console.error("Error restocking item:", err);
-      throw err;
+    } catch (err: any) {
+      console.error("Error restocking item:", err.message || err);
+      throw new Error(err.message || "Failed to restock item");
     }
   };
 
@@ -123,7 +161,9 @@ export const InventoryProvider = ({
     }
   };
 
-  const deductStock = async (items: { menu_item_id: number; quantity: number }[]) => {
+  const deductStock = async (
+    items: { menu_item_id: number; quantity: number }[]
+  ) => {
     try {
       for (const { menu_item_id, quantity } of items) {
         const { data, error } = await supabase
@@ -133,7 +173,9 @@ export const InventoryProvider = ({
           .single();
         if (error) throw error;
         if (data.stock_quantity < quantity) {
-          throw new Error(`Insufficient stock for menu_item_id ${menu_item_id}`);
+          throw new Error(
+            `Insufficient stock for menu_item_id ${menu_item_id}`
+          );
         }
         const newQuantity = data.stock_quantity - quantity;
         const { error: updateError } = await supabase
@@ -231,7 +273,7 @@ export const InventoryProvider = ({
       supabase.removeChannel(restockChannel);
     };
   }, []);
-  
+
   return (
     <InventoryContext.Provider
       value={{

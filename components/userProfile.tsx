@@ -5,7 +5,7 @@ import {
   HoverCardContent,
   HoverCardTrigger,
 } from "@/components/ui/hover-card";
-import { createClient } from "@/lib/supabase/server";
+import { createClient } from "@/utils/supabase/server";
 
 export async function Profile() {
   const supabase = await createClient();
@@ -39,7 +39,9 @@ export async function Profile() {
           <div className="space-y-3.">
             <h5>Settings</h5>
             <hr className="border-t my-1 " />
-            <h5 className=" cursor-pointer" onClick={signOut}>Sign out</h5>
+            <h5 className=" cursor-pointer" onClick={signOut}>
+              Sign out
+            </h5>
           </div>
         </div>
       </HoverCardContent>
