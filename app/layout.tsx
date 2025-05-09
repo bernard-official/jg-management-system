@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import localFont from "next/font/local";
 import "./globals.css";
 import { OrderProvider } from "@/context/order-context";
-import Inventory from "./restaurant/inventory/page";
 import { InventoryProvider } from "@/context/inventory-context";
 import { UserProvider } from "@/context/user-context";
 
