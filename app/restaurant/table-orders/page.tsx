@@ -5,7 +5,7 @@ import {
 } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
-export const tables = [
+const tables = [
   {
     id: 1,
     name: "Margherita Pizza",
