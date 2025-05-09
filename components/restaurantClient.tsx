@@ -270,15 +270,28 @@ export default function RestaurantClient() {
         ].reduce((sum, val) => sum + val, 0) + serviceFee;
 
         const stockItems = [
-          ...editedOrderItems.map((item) => {
-            const menuItem = menu.find((m) => m.name === item.name);
-            return { menu_item_id: menuItem?.id!, quantity: item.quantity };
-          }),
+          ...editedOrderItems
+            .map((item) => {
+              const menuItem = menu.find((m) => m.name === item.name);
+              return menuItem ? { menu_item_id: menuItem.id, quantity: item.quantity } : null;
+            })
+            .filter((item): item is { menu_item_id: number; quantity: number } => item !== null),
           ...selectedItems.map((item) => ({
             menu_item_id: item.id,
             quantity: item.quantity || 1,
           })),
         ];
+
+        // const stockItems = [
+        //   ...editedOrderItems.map((item) => {
+        //     const menuItem = menu.find((m) => m.name === item.name);
+        //     return { menu_item_id: menuItem?.id!, quantity: item.quantity };
+        //   }),
+        //   ...selectedItems.map((item) => ({
+        //     menu_item_id: item.id,
+        //     quantity: item.quantity || 1,
+        //   })),
+        // ];
 
         await deductStock(stockItems); // Deduct stock for all items
 
