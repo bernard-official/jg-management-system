@@ -212,6 +212,7 @@ export const InventoryProvider = ({
         menu_item_id: item.menu_item_id,
         stock_quantity: item.stock_quantity,
         low_stock_threshold: item.low_stock_threshold,
+        // @ts-expect-error: we are handling it later
         menu_item_name: item.menu_item.name,
       }));
       setInventory(formattedData);
