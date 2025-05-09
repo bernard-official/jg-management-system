@@ -398,8 +398,12 @@ export default function RestaurantClient() {
         toggleOrder();
       }
       setError(null);
-    } catch (err: any) {
-      setError(err.message || "Failed to checkout order");
+    } catch (err: unknown) {
+      if(err instanceof Error) {
+        setError(err.message || "Failed to checkout order");
+      } else {
+        setError("An unknown error occurred");
+      }
     }
   };
 
