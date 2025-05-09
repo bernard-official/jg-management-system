@@ -1,15 +1,16 @@
 "use client"
 import React, { useContext } from "react";
 import { Card, CardContent } from "@/components/ui/card";
-import { IoEllipsisVerticalOutline, IoPrintOutline, IoWalletOutline } from "react-icons/io5";
+import { IoEllipsisVerticalOutline, IoWalletOutline } from "react-icons/io5";
 import { MdOutlineBalance } from "react-icons/md";
 import { BsCashCoin } from "react-icons/bs";
 import { BsBank } from "react-icons/bs";
-import { Order } from "@/context/order-context";
+import { OrderContext } from "@/context/order-context";
 
 
 
-const OrderCards = ({orders}:{ orders: Order }) => {
+const OrderCards = () => {
+   const { orders } = useContext(OrderContext)!;
 
     const orderActivities = [
       { title: "total orders ", amount: orders.length, icon: <IoWalletOutline /> },

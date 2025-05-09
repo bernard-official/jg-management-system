@@ -9,6 +9,10 @@ export interface InventoryItem {
   menu_item_id: number;
   stock_quantity: number;
   low_stock_threshold: number;
+  // menu_item: {
+  //   id: number;
+  //   name: string;
+  // };
   menu_item_name: string;
 }
 export interface RestockHistory {
@@ -113,7 +117,6 @@ export const InventoryProvider = ({
       fetchInventory();
       fetchRestockHistory();
     } catch (err: any) {
-      console.error("Error restocking item:", err.message || err);
       throw new Error(err.message || "Failed to restock item");
     }
   };

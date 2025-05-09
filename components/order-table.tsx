@@ -9,17 +9,18 @@ import {
 import { RiAccountCircleLine } from "react-icons/ri";
 import { GiTakeMyMoney } from "react-icons/gi";
 import { PiContactlessPaymentThin } from "react-icons/pi";
-import { HiOutlineCalendarDateRange } from "react-icons/hi2";
 import { LuCircleDotDashed } from "react-icons/lu";
 import { AiOutlineTable } from "react-icons/ai";
-import { Order } from "@/context/order-context";
+import {  OrderContext } from "@/context/order-context";
 import { CiCalendarDate } from "react-icons/ci";
 import { GoStack } from "react-icons/go";
 import { HoverCard, HoverCardContent, HoverCardTrigger } from "./ui/hover-card";
+import { useContext } from "react";
 // import { useContext } from "react";
 
-export function OrderTable({ orders }: { orders: Order }) {
-  // const { orders } = useContext(OrderContext)
+// export function OrderTable({ orders }: { orders: Order }) {
+export function OrderTable() {
+  const { orders } = useContext(OrderContext)!;
 
   return (
     <>
@@ -75,7 +76,7 @@ export function OrderTable({ orders }: { orders: Order }) {
           </TableRow>
         </TableHeader>
         <TableBody className="overflow-auto">
-          {orders.map((order: Order) => {
+          {orders.map((order) => {
             const statusColor = () => {
               switch (order.status) {
                 case "pending":

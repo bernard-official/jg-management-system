@@ -1,5 +1,5 @@
 "use client";
-import React, { useContext, useState } from "react";
+import React, { useContext} from "react";
 import {
   Table,
   TableBody,
@@ -15,15 +15,16 @@ import { UserContext } from "@/context/user-context";
 import { SubmitButton } from "@/app/login/submit-button";
 import { signUp } from "@/actions/actions";
 import { Label } from "./ui/label";
-import { Switch } from "./ui/switch";
+// import { Switch } from "./ui/switch";
 import { RadioGroup, RadioGroupItem } from "./ui/radio-group";
 
 export const UsersClient = () => {
   const { error, loading, users, handleRoleUpdate } = useContext(UserContext)!;
-  const [sign, setSign] = useState(false);
-  const toggleButton = () => {
-    setSign(!sign);
-  };
+  // const [sign, setSign] = useState(false);
+  // const toggleButton = () => {
+  //   setSign(!sign);
+  // };
+
   return (
     <>
       {error && <p className="text-red-500">{error}</p>}

@@ -47,8 +47,12 @@ export const InventoryClient = () => {
       setRestockQuantities((prev) => ({ ...prev, [menu_item_id]: 0 }));
       console.log(`Restocked item ${menu_item_id} successfully`);
       setError(null);
-    } catch (err: any) {
-      setError(err.message || "Failed to restock item");
+    }catch (err: unknown) {
+      if (err instanceof Error) {
+        setError(err.message || "Failed to restock item");
+      } else {
+        setError("An unknown error occurred");
+      }
     }
   };
 
@@ -71,8 +75,12 @@ export const InventoryClient = () => {
         initial_stock: "",
       });
       setError(null);
-    } catch (err: any) {
-      setError(err.message || "Error adding product");
+    }catch (err: unknown) {
+      if (err instanceof Error) {
+        setError(err.message || "Error adding product");
+      } else {
+        setError("An unknown error occurred");
+      }
     }
   };
 

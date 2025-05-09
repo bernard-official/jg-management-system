@@ -6,8 +6,16 @@ export function cn(...inputs: ClassValue[]) {
 }
 
 
+// export interface MenuItem {
+//   id: string;
+//   name: string;
+//   price: number;
+//   description: string;
+//   category?: string; // Optional field
+//   quantity: number
+// }
 export interface MenuItem {
-  id: string;
+  id: number;
   name: string;
   price: number;
   description: string;

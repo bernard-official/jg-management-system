@@ -1,7 +1,7 @@
 "use client";
 import { signIn, signUp } from "@/actions/actions";
 // import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardTitle } from "@/components/ui/card";
+import { Card} from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import React, { useState } from "react";
 import { SubmitButton } from "./submit-button";

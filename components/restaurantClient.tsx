@@ -37,7 +37,7 @@ import {
 import { Input } from "./ui/input";
 import { Label } from "./ui/label";
 
-export default function RestaurantClient({ menu: initialMenu }: { menu: MenuItem[] }) {
+export default function RestaurantClient() {
   const {
     open,
     openEditOrder,
@@ -45,7 +45,6 @@ export default function RestaurantClient({ menu: initialMenu }: { menu: MenuItem
     toggleEditOrder,
     createOrder,
     updateOrder,
-    deleteOrder,
     orders,
   } = useContext(OrderContext)!;
 
@@ -172,7 +171,7 @@ export default function RestaurantClient({ menu: initialMenu }: { menu: MenuItem
 
     try {
       checkStock(selectedItems); // Validate stock before saving
-      const order = {
+      const order: Order = {
         order_id: Date.now(),
         customer_name: customerName.trim() || "Guest",
         table_number: tableNumber || null,
@@ -184,16 +183,20 @@ export default function RestaurantClient({ menu: initialMenu }: { menu: MenuItem
         action: "new",
       };
 
-      await createOrder(order);
-      console.log("Order created successfully");
+      createOrder(order);
       setSelectedItems([]);
       setCustomerName("");
       setTableNumber(null);
       toggleOrder();
       setError(null);
-    } catch (err: any) {
-      setError(err.message || "Failed to create order");
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        setError(err.message || "Failed to create order");
+      } else {
+        setError("An unknown error occurred");
+      }
     }
+    
   };
 
   const handleUpdateOrder = async () => {
@@ -233,8 +236,12 @@ export default function RestaurantClient({ menu: initialMenu }: { menu: MenuItem
       setSelectedEditedItemId(null);
       toggleEditOrder();
       setError(null);
-    } catch (err: any) {
-      setError(err.message || "Failed to update order");
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        setError(err.message || "Failed to update order");
+      }else {
+        setError("An unknown error occurred");
+      }
     }
   };
 

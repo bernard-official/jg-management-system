@@ -1,22 +1,16 @@
 "use client";
-import React, { useContext } from "react";
+import React from "react";
 import {
   IoPrintOutline,
 } from "react-icons/io5";
-import { MdOutlineBalance } from "react-icons/md";
-import { BsCashCoin } from "react-icons/bs";
-import { BsBank } from "react-icons/bs";
-// import { TransactionTable } from "@/components/table";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { OrderContext } from "@/context/order-context";
 import { OrderTable } from "@/components/order-table";
 import OrderCards from "@/components/order-cards";
 
 
 
 export default function Orders() {
-  const { orders } = useContext(OrderContext)!;
 
   return (
     <div className="space-y-8">
@@ -28,7 +22,7 @@ export default function Orders() {
 
         {/* top pane */}
       </div>
-      <OrderCards orders={orders} />
+      <OrderCards  />
       <div className="px-4 space-y-4">
         <div className="flex justify-between">
           <form action="">
@@ -38,7 +32,7 @@ export default function Orders() {
             <IoPrintOutline />
           </Button>
         </div>
-        <OrderTable orders={orders} />
+        <OrderTable />
       </div>
     </div>
   );
