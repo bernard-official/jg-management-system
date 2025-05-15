@@ -123,6 +123,7 @@ export default function RestaurantClient() {
     }
   };
 
+
   const handleItemClick = (item: MenuItem) => {
     setSelectedItems((prev) => {
       const existingItemIndex = prev.findIndex((i) => i.id === item.id);
@@ -505,7 +506,12 @@ export default function RestaurantClient() {
             {/* ... existing buttons */}
           </div>
           {/* ... existing UI */}
-          <Search open={searchOpen} onOpenChange={setSearchOpen} />
+          
+            <Search
+              open={searchOpen}
+              onOpenChange={setSearchOpen}
+              handleItemClick={handleItemClick} // Ensure this matches the prop name
+            />
         </div>
         <Tabs defaultValue="menu" className="space-y-4">
           <TabsList className="grid grid-cols-4 w-full md:w-1/2">
@@ -707,6 +713,7 @@ export default function RestaurantClient() {
           </Card>
         </div>
       )}
+      
       {openEditOrder && (
         <div className="pt-16">
           <Card className="border w-[400px] p-4">
