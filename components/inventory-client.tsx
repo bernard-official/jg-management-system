@@ -22,8 +22,10 @@ import {
 import { InventoryContext } from "@/context/inventory-context";
 import { HiMagnifyingGlass } from "react-icons/hi2";
 import Search from "./search";
+import { OrderContext } from "@/context/order-context";
 
 export const InventoryClient = () => {
+  const {handleItemClick} = useContext(OrderContext)!
   const { inventory, restockHistory, addProduct, restockItem } =
     useContext(InventoryContext)!;
   const [restockQuantities, setRestockQuantities] = useState<{
@@ -204,7 +206,7 @@ export const InventoryClient = () => {
             {/* ... existing buttons */}
           </div>
           {/* ... existing UI */}
-          <Search open={searchOpen} onOpenChange={setSearchOpen} />
+          <Search handleItemClick={handleItemClick} open={searchOpen} onOpenChange={setSearchOpen} />
         </div>
         <Table>
           <TableHeader>
