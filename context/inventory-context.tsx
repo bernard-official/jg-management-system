@@ -55,6 +55,7 @@ export const InventoryProvider = ({
   const [inventory, setInventory] = useState<InventoryItem[]>([]);
   const [menu, setMenu] = useState<MenuItem[]>([]);
   const [restockHistory, setRestockHistory] = useState<RestockHistory[]>([]);
+  // const[err, setErr] = useState<string | null>(null)
 
   const restockItem = async (menu_item_id: number, quantity: number) => {
     try {
@@ -117,7 +118,13 @@ export const InventoryProvider = ({
       fetchInventory();
       fetchRestockHistory();
     } catch (err: any) {
+    // } catch (err: unknown) {
       throw new Error(err.message || "Failed to restock item");
+      // if (err instanceof Error) {
+      //   setErr(err.message || "Failed to restock item");
+      // } else {
+      //   setErr("An unknown error occurred");
+      // }
     }
   };
 
