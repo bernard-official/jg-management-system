@@ -8,26 +8,114 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
-import { useContext } from "react";
-import { OrderContext } from "@/context/order-context";
-import { InventoryContext } from "@/context/inventory-context";
 import { Command, CommandEmpty, CommandGroup, CommandItem } from "@/components/ui/command";
 import { debounce } from "lodash";
+import { supabase } from "@/utils/supabase/clients";
+import { MenuItem } from "@/lib/utils";
+import { Order } from "@/context/order-context";
+import { InventoryItem, RestockHistory } from "@/context/inventory-context";
 
-export default function Search({ open, onOpenChange }: { open: boolean; onOpenChange: (open: boolean) => void }) {
-  const { orders } = useContext(OrderContext)!;
-  const { restockHistory, menu } = useContext(InventoryContext)!;
+export default function Search({
+  open,
+  onOpenChange,
+  handleItemClick, // Must match the prop name passed
+}: {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  handleItemClick: (item: MenuItem) => void;
+}) {
+  const [orderResults, setOrderResults] = useState<Order[]>([]);
+  const [restockResults, setRestockResults] = useState<RestockHistory[]>([]);
+  const [inventoryResults, setInventoryResults] = useState<InventoryItem[]>([]);
+  const [menuResults, setMenuResults] = useState<MenuItem[]>([]);
   const [query, setQuery] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
   const searchRef = useRef<HTMLInputElement>(null);
-  
-  //Debounced  search
-  const debouncedSetQuery = useCallback(
-    debounce((value: string)=> {
-      setQuery(value)
+
+  // Debounced search
+  const search = useCallback(
+    debounce(async (value: string) => {
+      if (!value.trim()) {
+        setOrderResults([]);
+        setRestockResults([]);
+        setInventoryResults([]);
+        setMenuResults([]);
+        setIsLoading(false);
+        return;
+      }
+
+      setIsLoading(true);
+
+      // Verify authentication
+      const { data: { user }, error: authError } = await supabase.auth.getUser();
+      if (authError || !user) {
+        console.error("Auth error: No user logged in", authError);
+        setIsLoading(false);
+        return;
+      }
+      console.log("Authenticated user:", user.id, user.email);
+
+      // Search orders
+      // .or(
+      //   `order_id::bigint.ilike.%${value}%,customer_name.ilike.%${value}%,status::text.ilike.%${value}%,items.ilike.%${value}%`
+      // );
+      // .or(
+      //   `customer_name.ilike.%${value}%,order_id::text.ilike.%${value}%,status.ilike.%${value}%`
+      // );
+      const { data: orders, error: orderError } = await supabase
+      .from("orders")
+      .select("*")
+      .ilike("customer_name", `%${value}%`)
+      if (orderError) {
+        console.error("Order search error:", orderError.message || orderError);
+      } else {
+        setOrderResults(orders || []);
+      }
+      
+      // Search restock history
+      // .or(`staff_name.ilike.%${value}%,menu.name.ilike.%${value}%`);
+      const { data: restock, error: restockError } = await supabase
+      .from("restock_history")
+      .select("*, menu!inner(name)")
+      .ilike("staff_name", `%${value}%`)
+      if (restockError) {
+        console.error("Restock search error:", restockError.message || restockError);
+      } else {
+        setRestockResults(restock || []);
+      }
+
+
+      const { data: inventory, error: inventoryError } = await supabase
+      .from("inventory")
+      .select("*, menu!inner(name)")
+      .ilike("", `%${value}%`)
+      if (inventoryError) {
+        console.error("Restock search error:", inventoryError.message || inventoryError);
+      } else {
+        setRestockResults(inventory || []);
+      }
+
+      // Search menu
+      const { data: menu, error: menuError } = await supabase
+        .from("menu")
+        .select("*")
+        .ilike("name", `%${value}%`);
+      if (menuError) {
+        console.error("Menu search error:", menuError.message || menuError);
+      } else {
+        setMenuResults(menu || []);
+      }
+
+      setIsLoading(false);
     }, 300),
     []
   );
-  
+
+  // Update query and trigger search
+  const handleChange = (value: string) => {
+    setQuery(value);
+    search(value);
+  };
 
   // Focus input when modal opens
   useEffect(() => {
@@ -35,27 +123,6 @@ export default function Search({ open, onOpenChange }: { open: boolean; onOpenCh
       searchRef.current.focus();
     }
   }, [open]);
-
-  // Filter orders and restock history
-  const filteredOrders = orders
-    .filter((order) => order.status !== "completed")
-    .filter(
-      (order) =>
-        query &&
-        (order.order_id.toString().includes(query) ||
-          order.customer_name.toLowerCase().includes(query.toLowerCase()) ||
-          order.status.toLowerCase().includes(query.toLowerCase()))
-    );
-
-  const filteredRestock = restockHistory.filter(
-    (record) =>
-      query &&
-      (record.staff_name.toLowerCase().includes(query.toLowerCase()) ||
-        menu
-          .find((m) => m.id === record.menu_item_id)
-          ?.name.toLowerCase()
-          .includes(query.toLowerCase()))
-  );
 
   // Handle keyboard shortcut (Cmd + K)
   useEffect(() => {
@@ -69,38 +136,62 @@ export default function Search({ open, onOpenChange }: { open: boolean; onOpenCh
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [onOpenChange]);
 
+  // Dispatch event to add menu item to order
+  const handleMenuSelect = (item: MenuItem) => {
+    handleItemClick(item);
+    onOpenChange(false);
+    setQuery("");
+  };
+
+  // Dispatch event to open existing order
+  const handleOrderSelect = (order: Order) => {
+    console.log("Selected order:", order);
+    window.dispatchEvent(
+      new CustomEvent("openExistingOrder", { detail: order.id })
+    );
+    onOpenChange(false);
+    setQuery("");
+  };
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[600px]">
+      <DialogContent className="sm:max-w-[600px] ">
         <DialogHeader>
           <DialogTitle>Search</DialogTitle>
         </DialogHeader>
         <Command>
           <Input
             ref={searchRef}
-            placeholder="What are you searching for? 👀"
+            placeholder="Search orders, restock history, or menu items 👀"
             value={query}
-            onChange={(e) => debouncedSetQuery(e.target.value)}
-            className="w-full"
-          />
-          <CommandEmpty>No results found.</CommandEmpty>
-          <CommandGroup heading="Orders">
-            {filteredOrders.map((order) => (
+            onChange={(e) => handleChange(e.target.value)}
+            className=" w-full"
+            aria-label="Search orders, restock history, or menu items"
+            />           
+            <div className="max-h-[60vh]  overflow-y-auto">
+          <CommandEmpty>{isLoading ? "Searching..." : "No results found."}</CommandEmpty>
+          <CommandGroup heading="Menu Items">
+            {menuResults.map((item) => (
               <CommandItem
-                key={order.id}
-                onSelect={() => {
-                  // Handle order selection (e.g., navigate or open dialog)
-                  console.log("Selected order:", order);
-                  onOpenChange(false);
-                  setQuery("");
-                }}
+              key={item.id}
+                onSelect={() => handleMenuSelect(item)}
+                >
+                {item.name} - GHC {item.price.toFixed(2)} ({item.category})
+              </CommandItem>
+            ))}
+          </CommandGroup>
+          <CommandGroup heading="Orders">
+            {orderResults.map((order) => (
+              <CommandItem
+              key={order.id}
+              onSelect={() => handleOrderSelect(order)}
               >
                 Order #{order.order_id} - {order.customer_name} ({order.status})
               </CommandItem>
             ))}
           </CommandGroup>
           <CommandGroup heading="Restock History">
-            {filteredRestock.map((record) => (
+            {restockResults.map((record) => (
               <CommandItem
                 key={record.id}
                 onSelect={() => {
@@ -109,10 +200,25 @@ export default function Search({ open, onOpenChange }: { open: boolean; onOpenCh
                   setQuery("");
                 }}
               >
-                {menu.find((m) => m.id === record.menu_item_id)?.name} - {record.quantity} by {record.staff_name}
+                {record.menu_item_id} - {record.quantity} by {record.staff_name}
               </CommandItem>
             ))}
           </CommandGroup>
+          <CommandGroup heading="inventory list">
+            {inventoryResults.map((stock) => (
+              <CommandItem
+              key={stock.id}
+              onSelect={() => {
+                console.log("Selected restock:", stock);
+                onOpenChange(false);
+                setQuery("");
+              }}
+              >
+                {stock.menu_item_name} - {stock.stock_quantity} in stock
+              </CommandItem>
+            ))}
+          </CommandGroup>
+        </div>
         </Command>
       </DialogContent>
     </Dialog>
