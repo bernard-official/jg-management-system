@@ -20,8 +20,12 @@ import {
   TableRow,
 } from "./ui/table";
 import { InventoryContext } from "@/context/inventory-context";
+import { HiMagnifyingGlass } from "react-icons/hi2";
+import Search from "./search";
+import { OrderContext } from "@/context/order-context";
 
 export const InventoryClient = () => {
+  const {handleItemClick} = useContext(OrderContext)!
   const { inventory, restockHistory, addProduct, restockItem } =
     useContext(InventoryContext)!;
   const [restockQuantities, setRestockQuantities] = useState<{
@@ -35,6 +39,7 @@ export const InventoryClient = () => {
     initial_stock: "",
   });
   const [error, setError] = useState<string | null>(null);
+  const [searchOpen, setSearchOpen] = useState(false);
 
   const handleRestock = async (menu_item_id: number) => {
     const quantity = restockQuantities[menu_item_id] || 0;
@@ -47,7 +52,7 @@ export const InventoryClient = () => {
       setRestockQuantities((prev) => ({ ...prev, [menu_item_id]: 0 }));
       console.log(`Restocked item ${menu_item_id} successfully`);
       setError(null);
-    }catch (err: unknown) {
+    } catch (err: unknown) {
       if (err instanceof Error) {
         setError(err.message || "Failed to restock item");
       } else {
@@ -75,7 +80,7 @@ export const InventoryClient = () => {
         initial_stock: "",
       });
       setError(null);
-    }catch (err: unknown) {
+    } catch (err: unknown) {
       if (err instanceof Error) {
         setError(err.message || "Error adding product");
       } else {
@@ -193,6 +198,15 @@ export const InventoryClient = () => {
               </Table>
             </DialogContent>
           </Dialog>
+          <div className="flex justify-between w-full">
+            <Button variant="outline" onClick={() => setSearchOpen(true)}>
+              <HiMagnifyingGlass className="h-5 w-5 mr-2" />
+              Search (Cmd + K)
+            </Button>
+            {/* ... existing buttons */}
+          </div>
+          {/* ... existing UI */}
+          <Search handleItemClick={handleItemClick} open={searchOpen} onOpenChange={setSearchOpen} />
         </div>
         <Table>
           <TableHeader>
