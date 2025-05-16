@@ -28,6 +28,7 @@ export interface OrderContext {
   updateOrder: (id: number, order: Partial<Order>) => void;
   deleteOrder: (id: number) => void;
   handleItemClick: (item: MenuItem) => void;
+  toggleSelectedItem: () => void;
 }
 
 export const OrderContext = createContext<OrderContext | null>(null);
@@ -84,6 +85,11 @@ export const OrderProvider = ({ children }: { children: React.ReactNode }) => {
   }, []); // No dependencies since supabase is stable
 
   //toggle order
+  const toggleSelectedItem = () => {
+    setSelectedItems(selectedItems  );
+  };
+
+
   const toggleOrder = () => {
     setOpen(!open);
   };
@@ -169,7 +175,8 @@ export const OrderProvider = ({ children }: { children: React.ReactNode }) => {
         createOrder,
         updateOrder,
         deleteOrder,
-        handleItemClick
+        handleItemClick,
+        toggleSelectedItem,
       }}
     >
       {children}
