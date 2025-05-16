@@ -32,7 +32,7 @@ export function OrderTable() {
             <TableHead>
               <div className="flex  flex-row items-center space-x-2">
                 <RiAccountCircleLine />
-                <h4>Name</h4>
+                <h4> Customer Name</h4>
               </div>
             </TableHead>
             <TableHead>

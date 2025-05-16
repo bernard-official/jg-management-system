@@ -20,6 +20,11 @@ export const metadata: Metadata = {
   title: "Jasglynn Bar Management System",
   description:
     "A full-stack restaurant management app for inventory, orders, and menu updates.",
+    icons: {
+      icon:"/favicon.ico",
+      apple: "/favicon.ico",
+      shortcut: "/favicon.ico", 
+    },
 };
 
 export default function RootLayout({

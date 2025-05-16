@@ -6,7 +6,7 @@ import { Profile } from './userProfile'
 
 const Header = () => {
   return (
-    <div className='.sticky .fixed w-full flex justify-between items-center'>
+    <div className=' w-full flex justify-between items-center'>
        <Breadcrumb>
             <BreadcrumbList>
               <BreadcrumbItem className="hidden md:block">

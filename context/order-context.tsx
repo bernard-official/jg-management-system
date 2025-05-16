@@ -1,4 +1,5 @@
 "use client";
+import { MenuItem } from "@/lib/utils";
 import { supabase } from "@/utils/supabase/clients";
 import { UUID } from "crypto";
 import { createContext, useEffect, useState } from "react";
@@ -26,6 +27,8 @@ export interface OrderContext {
   createOrder: (order: Omit<Order, "id" | "created_at">) => void;
   updateOrder: (id: number, order: Partial<Order>) => void;
   deleteOrder: (id: number) => void;
+  handleItemClick: (item: MenuItem) => void;
+  toggleSelectedItem: () => void;
 }
 
 export const OrderContext = createContext<OrderContext | null>(null);
@@ -34,6 +37,8 @@ export const OrderProvider = ({ children }: { children: React.ReactNode }) => {
   const [orders, setOrders] = useState<Order[]>([]);
   const [open, setOpen] = useState(false);
   const [openEditOrder, setOpenEditOrder] = useState(false);
+  const [selectedItems, setSelectedItems] = useState<MenuItem[]>([]);
+  // const [selectedEditedItemId, setSelectedEditedItemId] = useState<Order | null>(null);
 
   // Fetch orders on mount and set up real-time subscription
   useEffect(() => {
@@ -80,6 +85,11 @@ export const OrderProvider = ({ children }: { children: React.ReactNode }) => {
   }, []); // No dependencies since supabase is stable
 
   //toggle order
+  const toggleSelectedItem = () => {
+    setSelectedItems(selectedItems  );
+  };
+
+
   const toggleOrder = () => {
     setOpen(!open);
   };
@@ -138,6 +148,22 @@ export const OrderProvider = ({ children }: { children: React.ReactNode }) => {
     }
   };
 
+    const handleItemClick = (item: MenuItem) => {
+      setSelectedItems((prev) => {
+        const existingItemIndex = prev.findIndex((i) => i.id === item.id);
+        if (existingItemIndex !== -1) {
+          const updatedItems = [...prev];
+          updatedItems[existingItemIndex] = {
+            ...updatedItems[existingItemIndex],
+            quantity: (updatedItems[existingItemIndex].quantity || 1) + 1,
+          };
+          return updatedItems;
+        } else {
+          return [...prev, { ...item, quantity: 1 }];
+        }
+      });
+    };
+
   return (
     <OrderContext.Provider
       value={{
@@ -149,6 +175,8 @@ export const OrderProvider = ({ children }: { children: React.ReactNode }) => {
         createOrder,
         updateOrder,
         deleteOrder,
+        handleItemClick,
+        toggleSelectedItem,
       }}
     >
       {children}

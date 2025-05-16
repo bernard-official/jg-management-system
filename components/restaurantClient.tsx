@@ -36,6 +36,8 @@ import {
 } from "./ui/table";
 import { Input } from "./ui/input";
 import { Label } from "./ui/label";
+import { HiMagnifyingGlass } from "react-icons/hi2";
+import Search from "./search";
 
 export default function RestaurantClient() {
   const {
@@ -50,15 +52,17 @@ export default function RestaurantClient() {
 
   const { menu, inventory, deductStock } = useContext(InventoryContext)!;
   const [selectedItems, setSelectedItems] = useState<MenuItem[]>([]);
-  const [selectedEditedItemId, setSelectedEditedItemId] = useState<Order | null>(null);
+  const [selectedEditedItemId, setSelectedEditedItemId] =
+    useState<Order | null>(null);
   const [editedOrderItems, setEditedOrderItems] = useState<
     { name: string; quantity: number }[]
   >([]);
   const [customerName, setCustomerName] = useState("");
   const [tableNumber, setTableNumber] = useState<number | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [searchOpen, setSearchOpen] = useState(false);
 
-  const serviceFee = 0.00;
+  const serviceFee = 0.0;
   const total = useMemo(
     () =>
       selectedItems.reduce(
@@ -68,7 +72,9 @@ export default function RestaurantClient() {
     [selectedItems]
   );
 
-  const parseOrderItems = (itemsString: string): { name: string; quantity: number }[] => {
+  const parseOrderItems = (
+    itemsString: string
+  ): { name: string; quantity: number }[] => {
     if (!itemsString) return [];
     return itemsString.split(", ").map((item) => {
       const match = item.match(/(.+)\s\(x(\d+)\)/);
@@ -91,10 +97,17 @@ export default function RestaurantClient() {
     return menuItem.price;
   };
 
-  const checkStock = (items: MenuItem[]): { menu_item_id: number; quantity: number }[] => {
+  const checkStock = (
+    items: MenuItem[]
+  ): { menu_item_id: number; quantity: number }[] => {
     return items.map((item) => {
-      const inventoryItem = inventory.find((inv) => inv.menu_item_id === item.id);
-      if (!inventoryItem || inventoryItem.stock_quantity < (item.quantity || 1)) {
+      const inventoryItem = inventory.find(
+        (inv) => inv.menu_item_id === item.id
+      );
+      if (
+        !inventoryItem ||
+        inventoryItem.stock_quantity < (item.quantity || 1)
+      ) {
         throw new Error(`Insufficient stock for ${item.name}`);
       }
       return { menu_item_id: item.id, quantity: item.quantity || 1 };
@@ -109,6 +122,7 @@ export default function RestaurantClient() {
       toggleEditOrder();
     }
   };
+
 
   const handleItemClick = (item: MenuItem) => {
     setSelectedItems((prev) => {
@@ -196,7 +210,6 @@ export default function RestaurantClient() {
         setError("An unknown error occurred");
       }
     }
-    
   };
 
   const handleUpdateOrder = async () => {
@@ -207,16 +220,17 @@ export default function RestaurantClient() {
       ...selectedItems.map((item) => `${item.name} (x${item.quantity || 1})`),
     ].join(", ");
 
-    const total = [
-      ...editedOrderItems.map((item) => {
-        const menuItem = menu.find((m) => m.name === item.name);
-        return menuItem ? menuItem.price * item.quantity : 0;
-      }),
-      selectedItems.reduce(
-        (sum, item) => sum + item.price * (item.quantity || 1),
-        0
-      ),
-    ].reduce((sum, val) => sum + val, 0) + serviceFee;
+    const total =
+      [
+        ...editedOrderItems.map((item) => {
+          const menuItem = menu.find((m) => m.name === item.name);
+          return menuItem ? menuItem.price * item.quantity : 0;
+        }),
+        selectedItems.reduce(
+          (sum, item) => sum + item.price * (item.quantity || 1),
+          0
+        ),
+      ].reduce((sum, val) => sum + val, 0) + serviceFee;
 
     try {
       checkStock(selectedItems); // Validate new items
@@ -239,7 +253,7 @@ export default function RestaurantClient() {
     } catch (err: unknown) {
       if (err instanceof Error) {
         setError(err.message || "Failed to update order");
-      }else {
+      } else {
         setError("An unknown error occurred");
       }
     }
@@ -255,43 +269,40 @@ export default function RestaurantClient() {
       if (isEditOrder) {
         const allItems = [
           ...editedOrderItems.map((item) => `${item.name} (x${item.quantity})`),
-          ...selectedItems.map((item) => `${item.name} (x${item.quantity || 1})`),
+          ...selectedItems.map(
+            (item) => `${item.name} (x${item.quantity || 1})`
+          ),
         ].join(", ");
 
-        const total = [
-          ...editedOrderItems.map((item) => {
-            const menuItem = menu.find((m) => m.name === item.name);
-            return menuItem ? menuItem.price * item.quantity : 0;
-          }),
-          selectedItems.reduce(
-            (sum, item) => sum + item.price * (item.quantity || 1),
-            0
-          ),
-        ].reduce((sum, val) => sum + val, 0) + serviceFee;
+        const total =
+          [
+            ...editedOrderItems.map((item) => {
+              const menuItem = menu.find((m) => m.name === item.name);
+              return menuItem ? menuItem.price * item.quantity : 0;
+            }),
+            selectedItems.reduce(
+              (sum, item) => sum + item.price * (item.quantity || 1),
+              0
+            ),
+          ].reduce((sum, val) => sum + val, 0) + serviceFee;
 
         const stockItems = [
           ...editedOrderItems
             .map((item) => {
               const menuItem = menu.find((m) => m.name === item.name);
-              return menuItem ? { menu_item_id: menuItem.id, quantity: item.quantity } : null;
+              return menuItem
+                ? { menu_item_id: menuItem.id, quantity: item.quantity }
+                : null;
             })
-            .filter((item): item is { menu_item_id: number; quantity: number } => item !== null),
+            .filter(
+              (item): item is { menu_item_id: number; quantity: number } =>
+                item !== null
+            ),
           ...selectedItems.map((item) => ({
             menu_item_id: item.id,
             quantity: item.quantity || 1,
           })),
         ];
-
-        // const stockItems = [
-        //   ...editedOrderItems.map((item) => {
-        //     const menuItem = menu.find((m) => m.name === item.name);
-        //     return { menu_item_id: menuItem?.id!, quantity: item.quantity };
-        //   }),
-        //   ...selectedItems.map((item) => ({
-        //     menu_item_id: item.id,
-        //     quantity: item.quantity || 1,
-        //   })),
-        // ];
 
         await deductStock(stockItems); // Deduct stock for all items
 
@@ -385,7 +396,9 @@ export default function RestaurantClient() {
                     <tr>
                       <td>${item.name}</td>
                       <td>${item.quantity}</td>
-                      <td>GHC ${(getItemPrice(item.name) * item.quantity).toFixed(2)}</td>
+                      <td>GHC ${(
+                        getItemPrice(item.name) * item.quantity
+                      ).toFixed(2)}</td>
                     </tr>
                   `
                     )
@@ -418,7 +431,7 @@ export default function RestaurantClient() {
       }
       setError(null);
     } catch (err: unknown) {
-      if(err instanceof Error) {
+      if (err instanceof Error) {
         setError(err.message || "Failed to checkout order");
       } else {
         setError("An unknown error occurred");
@@ -438,7 +451,7 @@ export default function RestaurantClient() {
         {error && <p className="text-red-500">{error}</p>}
         <div className="flex space-x-4">
           <Button onClick={toggleOrder}>New Order</Button>
-          <Dialog >
+          <Dialog>
             <DialogTrigger asChild>
               <Button variant="default">Existing Orders</Button>
             </DialogTrigger>
@@ -449,48 +462,71 @@ export default function RestaurantClient() {
                   View all existing orders in the system
                 </DialogDescription>
               </DialogHeader>
-                  <div className=" h-[60vh] overflow-auto ">
-              <Table className=" max-h-96 overflow-x-hidden">
-                {/* <TableHeader className=" .bg-white .sticky .fixed"> */}
-                <TableHeader className="sticky top-0 bg-background" >
-                  
-
-                  <TableRow>
-                    <TableHead className="w-[100px]">Order ID</TableHead>
-                    <TableHead>Name</TableHead>
-                    <TableHead>Status</TableHead>
-                    <TableHead className=".text-right">Amount</TableHead>
-                  </TableRow>
-                 
-                </TableHeader>
-                  {/* <div className="border border-red-500 h-[30vh] w-full .overflow-auto "> */}
-                <TableBody>
-                  {orders
-                   .filter((order) => order.status !== "completed")
-                  .map((order: Order) => (
-                    <TableRow
-                    key={order.id}
-                    onClick={() => handleExistingOrders(order.id!)}
-                    >
-                      <TableCell className="font-medium">{order.order_id}</TableCell>
-                      <TableCell>{order.customer_name}</TableCell>
-                      <TableCell>{order.status}</TableCell>
-                      <TableCell className=".text-right">GHC {order.total}</TableCell>
+              <div className=" h-[60vh] overflow-auto ">
+                <Table className=" max-h-96 overflow-x-hidden">
+                  {/* <TableHeader className=" .bg-white .sticky .fixed"> */}
+                  <TableHeader className="sticky top-0 bg-background">
+                    <TableRow>
+                      <TableHead className="w-[100px]">Order ID</TableHead>
+                      <TableHead>Name</TableHead>
+                      <TableHead>Status</TableHead>
+                      <TableHead className=".text-right">Amount</TableHead>
                     </TableRow>
-                  ))}
-                </TableBody>
+                  </TableHeader>
+                  {/* <div className="border border-red-500 h-[30vh] w-full .overflow-auto "> */}
+                  <TableBody>
+                    {orders
+                      .filter((order) => order.status !== "completed")
+                      .map((order: Order) => (
+                        <TableRow
+                          key={order.id}
+                          onClick={() => handleExistingOrders(order.id!)}
+                        >
+                          <TableCell className="font-medium">
+                            {order.order_id}
+                          </TableCell>
+                          <TableCell>{order.customer_name}</TableCell>
+                          <TableCell>{order.status}</TableCell>
+                          <TableCell className=".text-right">
+                            GHC {order.total}
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                  </TableBody>
                   {/* </div> */}
-              </Table>
-                  </div>
+                </Table>
+              </div>
             </DialogContent>
           </Dialog>
+          <div className="flex justify-between w-full">
+            <Button variant="outline" onClick={() => setSearchOpen(true)}>
+              <HiMagnifyingGlass className="h-5 w-5 mr-2" />
+              Search (Cmd + K)
+            </Button>
+            {/* ... existing buttons */}
+          </div>
+          {/* ... existing UI */}
+          
+            <Search
+              open={searchOpen}
+              onOpenChange={setSearchOpen}
+              handleItemClick={handleItemClick} // Ensure this matches the prop name
+            />
         </div>
         <Tabs defaultValue="menu" className="space-y-4">
           <TabsList className="grid grid-cols-4 w-full md:w-1/2">
-            <TabsTrigger value="menu" className="font-bold">Full Menu</TabsTrigger>
-            <TabsTrigger value="appetizers" className="font-bold">Starters</TabsTrigger>
-            <TabsTrigger value="main" className="font-bold">Main Dishes</TabsTrigger>
-            <TabsTrigger value="beverages" className="font-bold">Beverages</TabsTrigger>
+            <TabsTrigger value="menu" className="font-bold">
+              Full Menu
+            </TabsTrigger>
+            <TabsTrigger value="appetizers" className="font-bold">
+              Starters
+            </TabsTrigger>
+            <TabsTrigger value="main" className="font-bold">
+              Main Dishes
+            </TabsTrigger>
+            <TabsTrigger value="beverages" className="font-bold">
+              Beverages
+            </TabsTrigger>
           </TabsList>
           <TabsContent value="menu">
             <Menulist menu={menu} onItemClick={handleItemClick} />
@@ -585,33 +621,39 @@ export default function RestaurantClient() {
             <div className="flex justify-end">
               <IoMdClose onClick={handleCancelOrder} />
             </div>
-            <h2 className="text-lg flex justify-center font-bold">Jasglynn Bar</h2>
+            <h2 className="text-lg flex justify-center font-bold">
+              Jasglynn Bar
+            </h2>
             {selectedItems.length === 0 ? (
               <p>No items selected</p>
             ) : (
               <>
                 <div className="py-4 flex justify-center">#orderId</div>
-                <div  className="py-4 flex justify-start">
+                <div className="py-4 flex justify-start">
                   <Label className="text-xs font-semibold capitalize flex space-x-2 items-center pr-2">
                     name:
                   </Label>
-                  <Input placeholder='Guest name'  
-                  value={customerName}
-                  onChange={(e) => setCustomerName(e.target.value)}
-                  className="flex item-center  w-3/4" /> 
-                  
+                  <Input
+                    placeholder="Guest name"
+                    value={customerName}
+                    onChange={(e) => setCustomerName(e.target.value)}
+                    className="flex item-center  w-3/4"
+                  />
+
                   <Label className="text-xs font-semibold capitalize flex space-x-2 items-center pl-1 pr-2">
                     table:
                   </Label>
-                  <Input placeholder='1'  type="number" 
-                  value={tableNumber ?? ""}
-                  onChange={(e) =>
-                    setTableNumber(
-                      e.target.value === "" ? null : Number(e.target.value)
-                    )
-                  }
-                  className="flex item-center w-1/4" /> 
-
+                  <Input
+                    placeholder="1"
+                    type="number"
+                    value={tableNumber ?? ""}
+                    onChange={(e) =>
+                      setTableNumber(
+                        e.target.value === "" ? null : Number(e.target.value)
+                      )
+                    }
+                    className="flex item-center w-1/4"
+                  />
                 </div>
                 <div className="text-xs font-semibold flex justify-between">
                   <p>Item</p>
@@ -630,7 +672,9 @@ export default function RestaurantClient() {
                         >
                           -
                         </Button>
-                        <div className="flex items-center">x{item.quantity || 1}</div>
+                        <div className="flex items-center">
+                          x{item.quantity || 1}
+                        </div>
                         <Button
                           variant="outline"
                           size="sm"
@@ -657,7 +701,10 @@ export default function RestaurantClient() {
                   <Button onClick={handleSubmitOrder} className="mt-4">
                     Save Order
                   </Button>
-                  <Button onClick={() => handleCheckout(false)} className="mt-4">
+                  <Button
+                    onClick={() => handleCheckout(false)}
+                    className="mt-4"
+                  >
                     Proceed to CheckOut
                   </Button>
                 </div>
@@ -666,16 +713,21 @@ export default function RestaurantClient() {
           </Card>
         </div>
       )}
+      
       {openEditOrder && (
         <div className="pt-16">
           <Card className="border w-[400px] p-4">
             <div className="flex justify-end">
               <IoMdClose onClick={toggleEditOrder} />
             </div>
-            <h2 className="text-lg flex justify-center font-bold">Jasglynn Bar</h2>
+            <h2 className="text-lg flex justify-center font-bold">
+              Jasglynn Bar
+            </h2>
             {selectedEditedItemId ? (
               <>
-                <div className="py-4 flex justify-center">#{selectedEditedItemId.order_id}</div>
+                <div className="py-4 flex justify-center">
+                  #{selectedEditedItemId.order_id}
+                </div>
                 <div className="py-4 flex justify-start">
                   <span className="text-xs font-semibold capitalize flex space-x-2 items-center pr-3">
                     name:
@@ -696,31 +748,43 @@ export default function RestaurantClient() {
                   <p>Amt</p>
                 </div>
                 <ul>
-                  {parseOrderItems(selectedEditedItemId.items || "").map((item, index) => (
-                    <li key={`existing-${index}`} className="flex justify-between">
-                      <div className="flex items-center">{item.name}</div>
-                      <div className="flex space-x-2">
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => handleDecreaseQuantityExisting(index)}
-                        >
-                          -
-                        </Button>
-                        <div className="flex items-center">x{item.quantity}</div>
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => handleIncreaseQuantityExisting(index)}
-                        >
-                          +
-                        </Button>
-                      </div>
-                      <div className="flex items-center">
-                        GHC {(getItemPrice(item.name) * item.quantity).toFixed(2)}
-                      </div>
-                    </li>
-                  ))}
+                  {parseOrderItems(selectedEditedItemId.items || "").map(
+                    (item, index) => (
+                      <li
+                        key={`existing-${index}`}
+                        className="flex justify-between"
+                      >
+                        <div className="flex items-center">{item.name}</div>
+                        <div className="flex space-x-2">
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() =>
+                              handleDecreaseQuantityExisting(index)
+                            }
+                          >
+                            -
+                          </Button>
+                          <div className="flex items-center">
+                            x{item.quantity}
+                          </div>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() =>
+                              handleIncreaseQuantityExisting(index)
+                            }
+                          >
+                            +
+                          </Button>
+                        </div>
+                        <div className="flex items-center">
+                          GHC{" "}
+                          {(getItemPrice(item.name) * item.quantity).toFixed(2)}
+                        </div>
+                      </li>
+                    )
+                  )}
                   {selectedItems.map((item, index) => (
                     <li key={`new-${index}`} className="flex justify-between">
                       <div className="flex items-center">{item.name}</div>
@@ -732,7 +796,9 @@ export default function RestaurantClient() {
                         >
                           -
                         </Button>
-                        <div className="flex items-center">x{item.quantity || 1}</div>
+                        <div className="flex items-center">
+                          x{item.quantity || 1}
+                        </div>
                         <Button
                           variant="outline"
                           size="sm"
@@ -786,7 +852,3 @@ export default function RestaurantClient() {
     </div>
   );
 }
-
-
-
-
