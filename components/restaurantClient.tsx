@@ -499,7 +499,7 @@ export default function RestaurantClient() {
             </DialogContent>
           </Dialog>
           <div className="flex justify-between w-full">
-            <Button onClick={() => setSearchOpen(true)}>
+            <Button variant="outline" onClick={() => setSearchOpen(true)}>
               <HiMagnifyingGlass className="h-5 w-5 mr-2" />
               Search (Cmd + K)
             </Button>
