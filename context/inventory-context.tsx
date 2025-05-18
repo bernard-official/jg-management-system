@@ -9,11 +9,11 @@ export interface InventoryItem {
   menu_item_id: number;
   stock_quantity: number;
   low_stock_threshold: number;
+  menu_item_name: string;
   // menu_item: {
   //   id: number;
   //   name: string;
   // };
-  menu_item_name: string;
 }
 export interface RestockHistory {
   id: number;
