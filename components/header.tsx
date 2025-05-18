@@ -1,10 +1,9 @@
-import React, { useContext, useState } from 'react'
+import React from 'react'
 import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator } from './ui/breadcrumb'
 // import { SearchForm } from './search-form'
 import { Profile } from './userProfile'
 import { createClient } from '@/utils/supabase/server';
-import { Button } from './ui/button';
-import { useRouter } from 'next/router';
+// import { useRouter } from 'next/router';
 import { LoginButton } from './login-header';
 
 
