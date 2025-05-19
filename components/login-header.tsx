@@ -10,8 +10,8 @@ export const LoginButton = () => {
       router.push('/login');
     }
   return (
-    <Button onClick={handleClick} className='border rounded-xl p-2 px-2'>
-        log in
+    <Button onClick={handleClick} className='border  rounded-xl p-2 px-2'>
+        Log in
     </Button>
   )
 }
