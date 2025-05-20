@@ -1,4 +1,5 @@
-import React from "react";
+'use client'
+import React, { useEffect, useState } from "react";
 import {
   Sidebar,
   SidebarContent,
@@ -11,6 +12,7 @@ import {
   SidebarMenuItem,
   SidebarRail,
 } from "./ui/sidebar";
+import { usePathname } from "next/navigation";
 
 // This is sample data.
 const data = {
@@ -120,7 +122,18 @@ const data = {
 
 
 const RestaurantSidebar = ({ ...props }: React.ComponentProps<typeof Sidebar>) => {
-  
+   const pathname = usePathname()
+    const [activeItem, setActiveItem] = useState<string | null>(null);
+    // Sync active item with current route on page load or navigation
+      useEffect(() => {
+        setActiveItem(pathname); // Set initial active item based on current route
+      }, [pathname]);
+    
+      // Handle click to set the active item
+      const handleItemClick = (url: string) => {
+        setActiveItem(url);
+      };
+      
   return (
     <Sidebar {...props}>
       <SidebarHeader>
@@ -134,7 +147,10 @@ const RestaurantSidebar = ({ ...props }: React.ComponentProps<typeof Sidebar>) =
               <SidebarMenu>
                 {item.items.map((item, index) => (
                   <SidebarMenuItem key={index}>
-                    <SidebarMenuButton asChild isActive={item.isActive}>
+                    <SidebarMenuButton asChild 
+                       isActive={activeItem === item.url} // Dynamically set isActive
+                      onClick={() => handleItemClick(item.url)}
+                    >
                       <a href={item.url}>{item.title}</a>
                     </SidebarMenuButton>
                   </SidebarMenuItem>
