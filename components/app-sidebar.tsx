@@ -1,4 +1,6 @@
-import React from "react";
+'use client'
+import React, { useEffect, useState } from "react";
+import Image from "next/image";
 import {
   Sidebar,
   SidebarContent,
@@ -11,7 +13,9 @@ import {
   SidebarMenuItem,
   SidebarRail,
 } from "./ui/sidebar";
-import { VersionSwitcher } from "./version-switcher";
+import { usePathname } from "next/navigation";
+
+// import { VersionSwitcher } from "./version-switcher";
 
 // This is sample data.
 const data = {
@@ -24,6 +28,7 @@ const data = {
         {
           title: "Analytics",
           url: "/dashboard",
+           isActive: false,
         },
       ],
     },
@@ -34,11 +39,12 @@ const data = {
         {
           title: "Financial History",
           url: "/finance",
+          isActive: false
         },
         {
           title: "Data Fetching",
           url: "#",
-          isActive: true,
+          isActive: false,
         },
       ],
     },
@@ -49,11 +55,12 @@ const data = {
         {
           title: "Venue",
           url: "",
+           isActive: false,
         },
         {
           title: "Shops",
           url: "#",
-          isActive: true,
+          isActive: false,
         },
       ],
     },
@@ -64,10 +71,12 @@ const data = {
         {
           title: "Bookings",
           url: "#",
+          isActive: false,
         },
         {
           title: "Reports",
           url: "#",
+          isActive: false
         },
       ],
     },
@@ -78,14 +87,17 @@ const data = {
         {
           title: "Full Menu",
           url: "#",
+          isActive: false,
         },
         {
           title: "Stock Levels",
           url: "#",
+          isActive: false,
         },
         {
           title: "Reports",
           url: "#",
+          isActive: false,
         },
       ],
     },
@@ -96,10 +108,12 @@ const data = {
         {
           title: "Staff Management",
           url: "/userManagement",
+          isActive: false,
         },
         {
           title: "Roles &  Permissions",
           url: "#",
+          isActive: false,
         },
       ],
     },
@@ -108,14 +122,31 @@ const data = {
 
 
 const AppSidebar = ({ ...props }: React.ComponentProps<typeof Sidebar>) => {
+  const pathname = usePathname()
+  const [activeItem, setActiveItem] = useState<string | null>(null);
+
+  // Sync active item with current route on page load or navigation
+  useEffect(() => {
+    setActiveItem(pathname); // Set initial active item based on current route
+  }, [pathname]);
+
+  // Handle click to set the active item
+  const handleItemClick = (url: string) => {
+    setActiveItem(url);
+  };
   
+ 
+
   return (
     <Sidebar {...props}>
       <SidebarHeader>
-        <span className="font-bold capitalize">jasglynn</span>
-        <VersionSwitcher versions={data.versions} defaultVersion={data.versions[0]}  />
+        <div className="flex justify-start items-center">
+        <Image src="/logo.jpg" alt="logo" width={50} height={50} className="" />
+        <span className="ml-2 font-bold text-2xl capitalize">jasglynn</span>
+        </div>
+        {/* <VersionSwitcher versions={data.versions} defaultVersion={data.versions[0]}  /> */}
       </SidebarHeader>
-      <SidebarContent>
+      <SidebarContent className="">
         {data.navMain.map((item, index) => (
           <SidebarGroup key={index}>
             <SidebarGroupLabel>{item.title}</SidebarGroupLabel>
@@ -123,7 +154,12 @@ const AppSidebar = ({ ...props }: React.ComponentProps<typeof Sidebar>) => {
               <SidebarMenu>
                 {item.items.map((item, index) => (
                   <SidebarMenuItem key={index}>
-                    <SidebarMenuButton asChild isActive={item.isActive}>
+                    <SidebarMenuButton 
+                    asChild 
+                    // isActive={item.isActive}
+                    isActive={activeItem === item.url} // Dynamically set isActive
+                      onClick={() => handleItemClick(item.url)}
+                    >
                       <a href={item.url}>{item.title}</a>
                     </SidebarMenuButton>
                   </SidebarMenuItem>
