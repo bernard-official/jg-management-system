@@ -14,8 +14,7 @@ import {
   SidebarRail,
 } from "./ui/sidebar";
 import { usePathname } from "next/navigation";
-// import { useRouter } from "next/router";
-// import { useRouter } from "next/router";
+
 // import { VersionSwitcher } from "./version-switcher";
 
 // This is sample data.
