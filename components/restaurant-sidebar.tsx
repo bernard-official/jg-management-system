@@ -37,6 +37,24 @@ const data = {
       ],
     },
     {
+      title: "Inventory",
+      url: "#",
+      items: [
+        {
+          title: "Inventory stocks",
+          url: "/restaurant/inventory",
+        },
+        // {
+        //   title: "Stock Levels",
+        //   url: "#",
+        // },
+        // {
+        //   title: "Reports",
+        //   url: "#",
+        // },
+      ],
+    },
+    {
       title: "Assets",
       url: "#",
       items: [

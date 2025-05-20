@@ -4,12 +4,8 @@ import {
   CardContent
 } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-// import Image from "next/image";
-// import cleardrink from "@/public/cleardrink.png";
-// import food from "@/public/food.png";
-import OrderSummary from "@/components/order-summary";
 
-export const tables = [
+const tables = [
   {
     id: 1,
     name: "Margherita Pizza",
@@ -195,12 +191,12 @@ export default function Restaurant() {
           </Tabs>
         </div>
         {/* pop-up right pane */}
-        <div className="pt-4 space-y-4 ">
+        {/* <div className="pt-4 space-y-4 ">
         <h1 className="text-xl font-bold">Order Summary &#40;total&#41;</h1>
         <div className="border w-[400px] ">
-        <OrderSummary />
+        show orders here
         </div>
-      </div>
+      </div> */}
       </div>
     </div>
   );
