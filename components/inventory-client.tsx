@@ -23,6 +23,7 @@ import { InventoryContext } from "@/context/inventory-context";
 import { HiMagnifyingGlass } from "react-icons/hi2";
 import Search from "./search";
 import { OrderContext } from "@/context/order-context";
+import { toast } from "@/hooks/use-toast";
 
 export const InventoryClient = () => {
   const {handleItemClick} = useContext(OrderContext)!
@@ -80,11 +81,26 @@ export const InventoryClient = () => {
         initial_stock: "",
       });
       setError(null);
+      toast({
+        title: "Success",
+        description: "✅ Product added successfully",
+        variant: "default",
+      })
     } catch (err: unknown) {
       if (err instanceof Error) {
         setError(err.message || "Error adding product");
+        toast({
+          title: "Error",
+          description: `${err.message} Error adding product`,
+          variant: "destructive",
+        })
       } else {
         setError("An unknown error occurred");
+        toast({
+          title: "Error",
+          description: `An unknown error occurred 🤔`,
+          variant: "destructive",
+        })
       }
     }
   };
