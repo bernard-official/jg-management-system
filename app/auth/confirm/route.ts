@@ -22,7 +22,7 @@
 //   // URL to redirect to after sign up process completes
 //   return NextResponse.redirect(`${origin}/dashboard`);
 // }
-
+ 
 import { type EmailOtpType } from "@supabase/supabase-js";
 import { type NextRequest } from "next/server";
 

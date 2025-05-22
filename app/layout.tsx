@@ -4,6 +4,7 @@ import "./globals.css";
 import { OrderProvider } from "@/context/order-context";
 import { InventoryProvider } from "@/context/inventory-context";
 import { UserProvider } from "@/context/user-context";
+import { ToastProvider } from "@/context/toast-context";
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -20,11 +21,11 @@ export const metadata: Metadata = {
   title: "Jasglynn Bar Management System",
   description:
     "A full-stack restaurant management app for inventory, orders, and menu updates.",
-    icons: {
-      icon:"/favicon.ico",
-      apple: "/favicon.ico",
-      shortcut: "/favicon.ico", 
-    },
+  icons: {
+    icon: "/favicon.ico",
+    apple: "/favicon.ico",
+    shortcut: "/favicon.ico",
+  },
 };
 
 export default function RootLayout({
@@ -37,11 +38,13 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <UserProvider>
-          <InventoryProvider>
-            <OrderProvider>{children}</OrderProvider>
-          </InventoryProvider>
-        </UserProvider>
+        <ToastProvider>
+          <UserProvider>
+            <InventoryProvider>
+              <OrderProvider>{children}</OrderProvider>
+            </InventoryProvider>
+          </UserProvider>
+        </ToastProvider>
       </body>
     </html>
   );

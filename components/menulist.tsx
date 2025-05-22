@@ -24,7 +24,7 @@ function Menulist({
 }: MenulistProps) {
   return (
     <>
-      <Card className="">
+      <Card className="max-h-[75vh] overflow-y-auto">
         <CardHeader>
           <CardTitle>Menu List</CardTitle>
           <CardDescription>
