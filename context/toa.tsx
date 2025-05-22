@@ -35,9 +35,9 @@ export const ToastProvider = ({ children }: { children: ReactNode }) => {
     toast({
       title,
       description,
-      variant,
+    //   variant,
       duration,
-      action,
+    //   action,
     });
   };
 
