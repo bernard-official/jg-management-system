@@ -1,8 +1,6 @@
-// app/employees/page.tsx
 "use client";
 
 import { useState, useEffect } from "react";
-// import { createClient } from "@/utils/supabase/client"; // Client-side Supabase client
 import { useToast } from "@/hooks/use-toast";
 import {
   Avatar,
@@ -24,9 +22,17 @@ import { Label } from "@/components/ui/label";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
-import { Loader2, Upload } from "lucide-react"; // Icons for loading and upload
+import { Loader2, Upload } from "lucide-react";
 import Link from "next/link";
 import { supabase } from "@/utils/supabase/clients";
+import { User } from "@supabase/supabase-js";
+
+// Define a type for user metadata to improve type safety
+interface UserMetadata {
+  display_name?: string;
+  avatar_url?: string;
+  role?: string;
+}
 
 // Form schema for validation
 const profileSchema = z.object({
@@ -41,8 +47,7 @@ type ProfileFormValues = z.infer<typeof profileSchema>;
 
 export default function ProfilePage() {
   const { toast } = useToast();
-//   const supabase = createClient();
-  const [user, setUser] = useState<any>(null); // Store user data
+  const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [avatarFile, setAvatarFile] = useState<File | null>(null);
 
@@ -90,6 +95,8 @@ export default function ProfilePage() {
 
   // Handle form submission
   const onSubmit = async (data: ProfileFormValues) => {
+    if (!user) return;
+
     setIsLoading(true);
     try {
       let avatarUrl = data.avatarUrl;
@@ -98,8 +105,8 @@ export default function ProfilePage() {
       if (avatarFile) {
         const fileExt = avatarFile.name.split(".").pop();
         const fileName = `${user.id}-${Date.now()}.${fileExt}`;
-        const { data: uploadData, error: uploadError } = await supabase.storage
-          .from("avatars") // Assumes a bucket named "avatars"
+        const { error: uploadError } = await supabase.storage
+          .from("avatars")
           .upload(fileName, avatarFile);
 
         if (uploadError) {
@@ -125,25 +132,29 @@ export default function ProfilePage() {
         throw new Error(`Failed to update profile: ${updateError.message}`);
       }
 
-      // Update local state
-      setUser((prev: any) => ({
-        ...prev,
-        user_metadata: {
-          ...prev.user_metadata,
-          display_name: data.displayName,
-          avatar_url: avatarUrl,
-        },
-      }));
+      // Update local state with typed User
+      setUser((prev) => {
+        if (!prev) return prev;
+        return {
+          ...prev,
+          user_metadata: {
+            ...prev.user_metadata,
+            display_name: data.displayName,
+            avatar_url: avatarUrl,
+          } as UserMetadata,
+        };
+      });
 
       toast({
         title: "Profile Updated",
         description: "Your profile has been updated successfully.",
         variant: "default",
       });
-    } catch (error: any) {
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : "Failed to update profile.";
       toast({
         title: "Error",
-        description: error.message || "Failed to update profile.",
+        description: errorMessage,
         variant: "destructive",
       });
     } finally {
@@ -173,7 +184,7 @@ export default function ProfilePage() {
   }
 
   return (
-    <div className=" min-h-screen flex items-center justify-center bg-background p-4">
+    <div className="min-h-screen flex items-center justify-center bg-background p-4">
       <Card className="w-full max-w-md">
         <CardHeader>
           <CardTitle className="text-2xl">Profile Settings</CardTitle>
@@ -257,11 +268,7 @@ export default function ProfilePage() {
 
                 {/* Form Actions */}
                 <div className="flex justify-between">
-                  <Button
-                    type="button"
-                    variant="outline"
-                    asChild
-                  >
+                  <Button type="button" variant="outline" asChild>
                     <Link href="/dashboard">Cancel</Link>
                   </Button>
                   <Button type="submit" disabled={isLoading}>
