@@ -13,6 +13,7 @@ import {
   SidebarRail,
 } from "./ui/sidebar";
 import { usePathname } from "next/navigation";
+import Image from "next/image";
 
 // This is sample data.
 const data = {
@@ -137,7 +138,10 @@ const RestaurantSidebar = ({ ...props }: React.ComponentProps<typeof Sidebar>) =
   return (
     <Sidebar {...props}>
       <SidebarHeader>
-        <span className="font-bold capitalize">jasglynn</span>
+       <div className="flex justify-start items-center">
+          <Image src="/logo.jpg" alt="logo" width={50} height={50} className="" />
+          <span className="ml-2 font-bold text-2xl capitalize">jasglynn</span>
+        </div>
       </SidebarHeader>
       <SidebarContent>
         {data.navMain.map((item, index) => (
@@ -151,7 +155,7 @@ const RestaurantSidebar = ({ ...props }: React.ComponentProps<typeof Sidebar>) =
                        isActive={activeItem === item.url} // Dynamically set isActive
                       onClick={() => handleItemClick(item.url)}
                     >
-                      <a href={item.url}>{item.title}</a>
+                      <a href={item.url} className=" font-semibold">{item.title}</a>
                     </SidebarMenuButton>
                   </SidebarMenuItem>
                 ))}

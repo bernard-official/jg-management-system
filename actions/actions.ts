@@ -1,5 +1,6 @@
 "use server";
 
+import { useAppToast } from "@/context/toast-context";
 import { createClient } from "@/utils/supabase/server";
 import { encodedRedirect } from "@/utils/utils";
 // import { FormState, SignupFormSchema } from "@/lib/zodSchema";
@@ -87,9 +88,8 @@ export async function updateUserRole(
 
 export async function signIn(formData: FormData) {
   const supabase = await createClient();
+  // const {toast} = useAppToast();
 
-  // type-casting here for convenience
-  // in practice, you should validate your inputs
   const email = formData.get("email") as string;
   const password = formData.get("password") as string;
 
@@ -99,13 +99,17 @@ export async function signIn(formData: FormData) {
   });
   console.log({ data });
   if (error) {
+    // toast({
+    //   title: "Error",
+    //   description: error.message,
+    //   variant: "destructive",
+    // })
     redirect("/error");
   }
 
   revalidatePath("/", "layout");
   redirect("/dashboard");
 }
-
 
 export async function signUp(formData: FormData) {
   const supabase = await createClient();
