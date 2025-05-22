@@ -38,6 +38,7 @@ import { Input } from "./ui/input";
 import { Label } from "./ui/label";
 import { HiMagnifyingGlass } from "react-icons/hi2";
 import Search from "./search";
+import { toast } from "@/hooks/use-toast";
 
 export default function RestaurantClient() {
   const {
@@ -244,17 +245,28 @@ export default function RestaurantClient() {
       };
 
       await updateOrder(selectedEditedItemId.id!, updatedOrder);
-      console.log("Order updated successfully");
       setSelectedItems([]);
       setEditedOrderItems([]);
       setSelectedEditedItemId(null);
       toggleEditOrder();
       setError(null);
+      // console.log("Order updated successfully");
+
     } catch (err: unknown) {
       if (err instanceof Error) {
         setError(err.message || "Failed to update order");
+        toast({
+      title: "Error",
+      description: err.message,
+      variant: "destructive",
+    });
       } else {
         setError("An unknown error occurred");
+        toast({
+      title: "Error",
+      description: "An unknown error occurred",
+      variant: "destructive",
+    });
       }
     }
   };
@@ -359,7 +371,8 @@ export default function RestaurantClient() {
         await createOrder(order);
         //@ts-expect-error: we are handling it later
         orderToPrint = order;
-        console.log("Order checked out successfully");
+        // console.log("Order checked out successfully");
+        
       }
 
       // Trigger print
@@ -430,11 +443,27 @@ export default function RestaurantClient() {
         toggleOrder();
       }
       setError(null);
+
+      toast({
+          title: "Order Checked Out",
+          description: "✅ Order checked out successfully",
+          variant: "default",
+        })
     } catch (err: unknown) {
       if (err instanceof Error) {
         setError(err.message || "Failed to checkout order");
+        toast({
+          title: "Order Checked Out",
+          description: `${err.message} Order checked out Failed`,
+          variant: "destructive",
+        })
       } else {
         setError("An unknown error occurred");
+        toast({
+          title: "Order Checked Out",
+          description: "An unknown error occurred 🤔",
+          variant: "destructive",
+        })
       }
     }
   };
@@ -513,6 +542,8 @@ export default function RestaurantClient() {
               handleItemClick={handleItemClick} // Ensure this matches the prop name
             />
         </div>
+
+        {/* Menu Tab Section */}
         <Tabs defaultValue="menu" className="space-y-4">
           <TabsList className="grid grid-cols-4 w-full md:w-1/2">
             <TabsTrigger value="menu" className="font-bold">
@@ -533,7 +564,7 @@ export default function RestaurantClient() {
           </TabsContent>
           <TabsContent value="appetizers">
             <Card>
-              <CardContent className="space-y-2">
+              <CardContent className="space-y-2  max-h-[75vh] overflow-y-auto">
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-2 md:gap-4">
                   {menu
                     .filter((item) => item.category === "Starters")
@@ -616,8 +647,8 @@ export default function RestaurantClient() {
         </Tabs>
       </div>
       {open && (
-        <div className="pt-16">
-          <Card className="border w-[400px] p-4">
+        <div className="pt-16 ">
+          <Card className="border w-[400px] p-4  max-h-[73vh] overflow-y-auto ">
             <div className="flex justify-end">
               <IoMdClose onClick={handleCancelOrder} />
             </div>
@@ -628,7 +659,7 @@ export default function RestaurantClient() {
               <p>No items selected</p>
             ) : (
               <>
-                <div className="py-4 flex justify-center">#orderId</div>
+                <div className="py-4 flex justify-center ">#orderId</div>
                 <div className="py-4 flex justify-start">
                   <Label className="text-xs font-semibold capitalize flex space-x-2 items-center pr-2">
                     name:
@@ -715,8 +746,8 @@ export default function RestaurantClient() {
       )}
       
       {openEditOrder && (
-        <div className="pt-16">
-          <Card className="border w-[400px] p-4">
+        <div className="pt-16 ">
+          <Card className="border w-[400px] p-4   max-h-[73vh] overflow-y-auto">
             <div className="flex justify-end">
               <IoMdClose onClick={toggleEditOrder} />
             </div>
@@ -836,9 +867,12 @@ export default function RestaurantClient() {
                 </div>
                 <div className="flex justify-between w-full">
                   <Button onClick={handleUpdateOrder} className="mt-4">
-                    Save Order
+                    Update Order
                   </Button>
-                  <Button onClick={() => handleCheckout(true)} className="mt-4">
+                  <Button 
+                  onClick={() => handleCheckout(true)} 
+                  className="mt-4"
+                  >
                     Proceed to CheckOut
                   </Button>
                 </div>

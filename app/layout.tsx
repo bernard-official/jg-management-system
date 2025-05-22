@@ -4,6 +4,7 @@ import "./globals.css";
 import { OrderProvider } from "@/context/order-context";
 import { InventoryProvider } from "@/context/inventory-context";
 import { UserProvider } from "@/context/user-context";
+import { ToastProvider } from "@/context/toa";
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -37,11 +38,14 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
+        <ToastProvider>
+
         <UserProvider>
           <InventoryProvider>
             <OrderProvider>{children}</OrderProvider>
           </InventoryProvider>
         </UserProvider>
+        </ToastProvider>
       </body>
     </html>
   );

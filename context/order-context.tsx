@@ -1,4 +1,5 @@
 "use client";
+import { useToast } from "@/hooks/use-toast";
 import { MenuItem } from "@/lib/utils";
 import { supabase } from "@/utils/supabase/clients";
 import { UUID } from "crypto";
@@ -39,13 +40,19 @@ export const OrderProvider = ({ children }: { children: React.ReactNode }) => {
   const [openEditOrder, setOpenEditOrder] = useState(false);
   const [selectedItems, setSelectedItems] = useState<MenuItem[]>([]);
   // const [selectedEditedItemId, setSelectedEditedItemId] = useState<Order | null>(null);
+  const {toast } = useToast();
 
   // Fetch orders on mount and set up real-time subscription
   useEffect(() => {
     const fetchOrders = async () => {
       const { data, error } = await supabase.from("orders").select("*");
       if (error) {
-        console.error("Error fetching orders:", error);
+        // console.error("Error fetching orders:", error);
+        toast({
+          title: "Error Fetching Orders",
+          description: `${error.message}. Please check network`,
+          variant: "destructive",
+        })
       } else {
         setOrders(data || []);
       }
@@ -105,17 +112,21 @@ export const OrderProvider = ({ children }: { children: React.ReactNode }) => {
       .insert([order])
       .select();
     if (error) {
-      console.error("Error creating order:", {
-        message: error.message,
-        code: error.code,
-        details: error.details,
-        hint: error.hint,
-      });
+      toast({
+        title: "Error",
+        description: `Order not Created : ${error.message}`,
+        variant: "destructive",
+      }); 
     } else if (data && data.length > 0) {
       setOrders((prevOrders) => {
         // Avoid duplicates if real-time already added it
         if (prevOrders.some((o) => o.id === data[0].id)) return prevOrders;
         return [...prevOrders, data[0]];
+      });
+      toast({
+        title: "Order created",
+        description: "✅ Order created successfully",
+        variant: "default",
       });
     }
   };
@@ -128,13 +139,23 @@ export const OrderProvider = ({ children }: { children: React.ReactNode }) => {
       .eq("id", id)
       .select();
     if (error) {
-      console.error("Error updating order:", error);
+      toast({
+         title: "Update Order Error",
+        description: error.message,
+        variant: "destructive",
+      });
+      // console.error("Error updating order:", error);
     } else if (data && data.length > 0) {
       setOrders((prevOrders) =>
         prevOrders.map((prevOrder) =>
           prevOrder.id === id ? { ...prevOrder, ...data[0] } : prevOrder
         )
       );
+      toast({
+         title: "Update Order",
+        description: '✅ Order updated successfully',
+        variant: "default",
+      });
     }
   };
 
@@ -142,9 +163,19 @@ export const OrderProvider = ({ children }: { children: React.ReactNode }) => {
   const deleteOrder = async (id: number) => {
     const { error } = await supabase.from("orders").delete().eq("id", id);
     if (error) {
-      console.error("Error deleting order:", error);
+       toast({
+         title: "Delete Order Error",
+        description: error.message,
+        variant: "destructive",
+      });
+      // console.error("Error deleting order:", error);
     } else {
       setOrders((prevOrders) => prevOrders.filter((order) => order.id !== id));
+       toast({
+         title: "Update Order Error",
+        description: '✅ Order deleted successfully',
+        variant: "default",
+      });
     }
   };
 
