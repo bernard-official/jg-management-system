@@ -39,7 +39,7 @@ export async function Profile() {
             <h3 className=" text-muted-foreground text-sm font-semibold">{user?.email}</h3>
           </div>
             <hr className="border-t my-1 " />
-          <div className="space-y-3">
+          <div className="">
             <h5 className=" cursor-pointer">Settings</h5>
             <h5 className=" cursor-pointer" onClick={signOut}>
               Sign out
@@ -52,3 +52,4 @@ export async function Profile() {
     </HoverCard>
   );
 }
+

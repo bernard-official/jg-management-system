@@ -72,6 +72,20 @@ const data = {
         },
       ],
     },
+    {
+      title: "Account Settings",
+      url: "#",
+      items: [
+        {
+          title: "Profile",
+          url: "/restaurant/employee",
+        },
+        {
+          title: "Reports",
+          url: "#",
+        },
+      ],
+    },
     // {
     //   title: "Operations",
     //   url: "#",
