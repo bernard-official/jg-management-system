@@ -1,25 +1,3 @@
-// import Link from "next/link";
-// import React from "react";
-// import { UsersClient } from "@/components/usersClient";
-// // import { users } from "./actions";
-// // import { handleRoleUpdate } from "./actions";
-
-// export default function page() {
-
-//   return (
-//     <div className="flex flex-col space-y-8 p-4">
-//       {/* <span className="text-red-500 ">Dashboard Coming Soon !!!</span>
-//        <Link href={"/restaurant"}>menu</Link> */}
-//       <h1 className="text-xl font-bold">Admin Dashboard</h1>
-//       <Link href="/restaurant" className="text-blue-500 hover:underline">
-//         Back to Restaurant
-//       </Link>
-//       <UsersClient />
-
-//     </div>
-//   );
-// }
-
 "use client";
 
 import { useState, useEffect } from "react";
@@ -40,9 +18,8 @@ import { supabase } from "@/utils/supabase/clients";
 import { startOfDay, endOfDay, format } from "date-fns";
 import { ChartAreaInteractive } from "@/components/chart-area-interactive";
 import { SectionCards } from "@/components/section-cards";
-import { Order } from "@/context/order-context";
 // import { sum } from "lodash";
-// import { Order } from "@/context/order-context";
+import { Order } from "@/context/order-context";
 
 // Define types for data
 // interface Order {
@@ -51,7 +28,7 @@ import { Order } from "@/context/order-context";
 //   total: number;
 //   status: string;
 //   created_at: string;
-//   user_id: string;
+//   staff_id: string;
 // }
 
 // interface UserProfile {
@@ -66,7 +43,7 @@ interface DashboardMetrics {
   pendingOrders: number;
   activeEmployees: number;
   recentOrders: Order[];
-  topEmployees: { display_name: string; order_count: number }[];
+  // topEmployees: { display_name: string; order_count: number }[];
 }
 
 export default function AdminDashboard() {
@@ -85,7 +62,7 @@ export default function AdminDashboard() {
 
         const { data: ordersToday, error: ordersError } = await supabase
           .from("orders")
-          .select("id, total, status, customer_name, created_at, staff_id, staff_name")
+          .select("*")
           .gte("created_at", startOfDayUTC)
           .lte("created_at", endOfDayUTC);
 
@@ -96,21 +73,6 @@ export default function AdminDashboard() {
         console.log("ordersToday", ordersToday);
           
         // Get today's date range
-        //   const today = new Date().toISOString().split("T")[0];
-        //   // console.log("today", today);
-        //  const startOfDay = `${today} 00:00:00.000000+00`;
-        //   const endOfDay = `${today} 23:59:59.999999+00`;
-     
-
-        // Fetch total orders today
-        // const { data: ordersToday, error: ordersError } = await supabase
-        //   .from("orders")
-        //   .select("id, total, status, customer_name, created_at, user_id")
-        //   .gte("created_at", startOfDay)
-        //   .lte("created_at", endOfDay);
-
-        // if (ordersError) throw ordersError;
-        // console.log("ordersToday", ordersToday);
 
         // Calculate metrics ---- data fetch produces result
         const totalOrdersToday = ordersToday.length;
@@ -166,6 +128,7 @@ export default function AdminDashboard() {
           // throw new Error(`RPC failed: ${topEmployeesError.message}`);
         }
 
+        // topEmployees: topEmployeesData || [],
 
         setMetrics({
           totalOrdersToday,
@@ -173,7 +136,6 @@ export default function AdminDashboard() {
           pendingOrders,
           activeEmployees,
           recentOrders,
-          topEmployees: topEmployeesData || [],
         });
       } catch (error: unknown) {
         const errorMessage =
@@ -201,23 +163,23 @@ export default function AdminDashboard() {
     );
   }
 
-  // if (!metrics) {
-  //   return (
-  //     <div className="flex min-h-screen items-center justify-center">
-  //       <Card className="w-full max-w-md">
-  //         <CardHeader>
-  //           <CardTitle>Error</CardTitle>
-  //         </CardHeader>
-  //         <CardContent>
-  //           <p className="text-muted-foreground">Failed to load dashboard data.</p>
-  //           <Button asChild className="mt-4">
-  //             <Link href="/restaurant">Back to Restaurant</Link>
-  //           </Button>
-  //         </CardContent>
-  //       </Card>
-  //     </div>
-  //   );
-  // }
+  if (!metrics) {
+    return (
+      <div className="flex min-h-screen items-center justify-center">
+        <Card className="w-full max-w-md">
+          <CardHeader>
+            <CardTitle>Error</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p className="text-muted-foreground">Failed to load dashboard data.</p>
+            <Button asChild className="mt-4">
+              <Link href="/restaurant">Back to Restaurant</Link>
+            </Button>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
 
   return (
     <div className="flex flex-col space-y-8 p-4 max-w-7xl mx-auto">
@@ -300,15 +262,15 @@ export default function AdminDashboard() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {/* {metrics.recentOrders.map((order) => ( */}
-              {/* <TableRow key={order.id}> */}
-              {/* <TableCell>{order.id}</TableCell> */}
-              {/* <TableCell>{order.customer_name || "N/A"}</TableCell> */}
-              {/* <TableCell>${order.total.toFixed(2)}</TableCell> */}
-              {/* <TableCell className="capitalize">{order.status}</TableCell> */}
-              {/* <TableCell>{new Date(order.created_at).toLocaleDateString()}</TableCell> */}
-              {/* </TableRow> */}
-              {/* ))} */}
+              {metrics.recentOrders.map((order) => ( 
+              <TableRow key={order.id}> 
+             <TableCell>#{order.order_id}</TableCell> 
+               <TableCell>{order.customer_name || "N/A"}</TableCell> 
+               <TableCell>${order.total.toFixed(2)}</TableCell> 
+               <TableCell className="capitalize">{order.status}</TableCell> 
+               <TableCell>{new Date(order.created_at).toLocaleDateString()}</TableCell> 
+              </TableRow> 
+               ))}
             </TableBody>
           </Table>
         </CardContent>
