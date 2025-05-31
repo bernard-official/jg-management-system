@@ -2,6 +2,8 @@
 import { updateUserRole } from "@/actions/actions";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/utils/supabase/clients";
+import { User } from "@supabase/supabase-js";
+// import { console } from "inspector";
 import React, { createContext, useEffect, useState } from "react";
 
 //the user table from the database has id which is foreign key from the auth table and role. look into adding the name and email as foregn keys from the supabase Auth user table as well
@@ -16,20 +18,34 @@ export interface Users {
 }
 
 export interface UsersContextType {
+  authUser: User | null;
   users: Users[];
   loading: boolean;
   error: string | null;
   fetchUsers: () => Promise<void>;
+  checkAuth: () => Promise<void>;
   handleRoleUpdate: (userId: string, newRole: "waiter" | "manager") => void;
 }
 export const UserContext = createContext<UsersContextType | null>(null);
 
 export const UserProvider = ({ children }: { children: React.ReactNode }) => {
+  const [authUser, setAuthUser] = useState<User | null>( null);
   const [users, setUsers] = useState<Users[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const { toast } = useToast();
 
+  const checkAuth = async () => {
+    const { data: authData, error: authError } = await supabase.auth.getUser();
+    if (authError) {
+      // throw new Error("Unauthorized: Please log in to restock items");
+      setAuthUser(null);
+    } else {
+      setAuthUser(authData.user);
+    }
+    // console.log("authUser context", authUser);
+  }
+ 
   const handleRoleUpdate = async (
     userId: string,
     newRole: "waiter" | "manager"
@@ -58,9 +74,7 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
   };
 
   const fetchUsers = async () => {
-   
     try {
-      // .select("*")
       const { data, error } = await supabase
         .from("users")
         .select("id, role, created_at, full_name, phone, email") //works now or i can just use * to get all
@@ -112,11 +126,13 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
   return (
     <UserContext.Provider
       value={{
+        authUser,
         users,
         loading,
         error,
         fetchUsers,
         handleRoleUpdate,
+        checkAuth,
       }}
     >
       {children}
