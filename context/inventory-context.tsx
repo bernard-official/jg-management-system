@@ -3,6 +3,7 @@ import { supabase } from "@/utils/supabase/clients";
 import { MenuItem } from "@/lib/utils";
 import { UUID } from "crypto";
 import React, { createContext, useState, useEffect } from "react";
+// import { User } from "@supabase/supabase-js";
 
 export interface InventoryItem {
   id: number;
@@ -41,10 +42,12 @@ export interface InventoryContextType {
   deductStock: (
     items: { menu_item_id: number; quantity: number }[]
   ) => Promise<void>;
+  // AuthUser: User;
+  // CurrentUser: string;
 }
 
 export const InventoryContext = createContext<InventoryContextType | null>(
-  null
+null
 );
 
 export const InventoryProvider = ({
@@ -78,6 +81,7 @@ export const InventoryProvider = ({
       if (userError || currentUser?.role !== "manager") {
         throw new Error("Unauthorized: Only managers can restock items");
       }
+      
 
       // Update inventory stock
       const { data, error } = await supabase
@@ -321,6 +325,8 @@ const fetchRestockHistory = async () => {
         restockItem,
         addProduct,
         deductStock,
+        // AuthUser,
+        // CurrentUser
       }}
     >
       {children}

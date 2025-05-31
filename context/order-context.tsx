@@ -2,7 +2,7 @@
 import { useToast } from "@/hooks/use-toast";
 import { MenuItem } from "@/lib/utils";
 import { supabase } from "@/utils/supabase/clients";
-import { UUID } from "crypto";
+// import { UUID } from "crypto";
 import { createContext, useEffect, useState } from "react";
 
 // Define the Order interface
@@ -16,7 +16,8 @@ export interface Order {
   total: number;
   status: "pending" | "preparing" | "completed" | "cancelled";
   action: string;
-  user_id?: UUID; //info about who created the order
+  staff_id?: string;
+  staff_name?: string; //info about who created the order
 }
 
 export interface OrderContext {
