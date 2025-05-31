@@ -39,6 +39,8 @@ import { Label } from "./ui/label";
 import { HiMagnifyingGlass } from "react-icons/hi2";
 import Search from "./search";
 import { toast } from "@/hooks/use-toast";
+// import { UserContext } from "@/context/user-context";
+import { supabase } from "@/utils/supabase/clients";
 
 export default function RestaurantClient() {
   const {
@@ -50,6 +52,11 @@ export default function RestaurantClient() {
     updateOrder,
     orders,
   } = useContext(OrderContext)!;
+
+  // const { users, authUser, } = useContext(UserContext)!;
+  // const username = users.find((user) => user.id === authUser?.id)?.name;
+  // console.log("username", username);
+
 
   const { menu, inventory, deductStock } = useContext(InventoryContext)!;
   const [selectedItems, setSelectedItems] = useState<MenuItem[]>([]);
@@ -72,7 +79,7 @@ export default function RestaurantClient() {
       ) + serviceFee,
     [selectedItems]
   );
-
+  // console.log("data structure of total", total);
   const parseOrderItems = (
     itemsString: string
   ): { name: string; quantity: number }[] => {
@@ -184,6 +191,25 @@ export default function RestaurantClient() {
   const handleSubmitOrder = async () => {
     if (selectedItems.length === 0) return;
 
+    // Fetch auth user metadata for additional fields like name
+    const { data: authUser, error: authError } = await supabase.auth.getUser();
+     if (authError || !authUser) {
+        throw new Error("Unauthorized: Please log in to restock items");
+      }
+    const authUserMetadata = authUser.user.id;
+
+     const { data: usersData, error: usersError } = await supabase
+      .from("users")
+      .select("role, full_name")
+      .eq("id", authUserMetadata)
+      .single();
+
+    if (usersError || !usersData) {
+      console.log("Error fetching users", usersError);
+      throw usersError;
+    }
+
+   
     try {
       checkStock(selectedItems); // Validate stock before saving
       const order: Order = {
@@ -196,7 +222,10 @@ export default function RestaurantClient() {
         total,
         status: "pending",
         action: "new",
+        staff_id: authUserMetadata,
+        staff_name: usersData?.full_name,
       };
+      console.log('order',order);
 
       createOrder(order);
       setSelectedItems([]);
@@ -350,6 +379,7 @@ export default function RestaurantClient() {
             .map((i) => `${i.name} (x${i.quantity || 1})`)
             .join(", "),
           total,
+          // user_id: user?.id,
           status: "completed",
           action: "completed",
         };
