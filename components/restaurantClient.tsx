@@ -39,7 +39,6 @@ import { Label } from "./ui/label";
 import { HiMagnifyingGlass } from "react-icons/hi2";
 import Search from "./search";
 import { toast } from "@/hooks/use-toast";
-// import { UserContext } from "@/context/user-context";
 import { supabase } from "@/utils/supabase/clients";
 
 export default function RestaurantClient() {
