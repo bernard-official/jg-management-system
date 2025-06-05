@@ -1,6 +1,7 @@
-import { IconTrendingDown, IconTrendingUp } from "@tabler/icons-react"
+"use client";
+import { IconTrendingDown, IconTrendingUp } from "@tabler/icons-react";
 
-import { Badge } from "@/components/ui/badge"
+import { Badge } from "@/components/ui/badge";
 import {
   Card,
   CardContent,
@@ -8,67 +9,115 @@ import {
   CardFooter,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card"
+} from "@/components/ui/card";
+import { use, useContext } from "react";
+import { DashboardMetricsContext } from "@/context/metric-context";
+import { constructFromSymbol } from "date-fns/constants";
 
 export function SectionCards() {
+  const { metrics, isLoading } = useContext(DashboardMetricsContext)!;
+  console.log("section: ", metrics?.totalOrdersToday);
   return (
     <div className="*:data-[slot=card]:from-primary/5 *:data-[slot=card]:to-card dark:*:data-[slot=card]:bg-card grid grid-cols-1 md:grid-cols-4 gap-4 .px-4 *:data-[slot=card]:bg-gradient-to-t *:data-[slot=card]:shadow-xs .lg:px-6 @xl/main:grid-cols-2 @5xl/main:grid-cols-4">
       <Card className="@container/card">
         <CardHeader>
-          <CardDescription>Total Revenue</CardDescription>
-          <CardTitle className="text-2xl font-semibold tabular-nums @[250px]/card:text-3xl">
-            $1,250.00
-          </CardTitle>
-          <CardContent>
+          <CardDescription>Total Revenue Today</CardDescription>
+          <div className="flex justify-between">
+            <CardTitle className="text-2xl font-semibold tabular-nums @[250px]/card:text-3xl">
+              {`GHC ${metrics?.totalOrdersToday.toFixed(2)}`}
+            </CardTitle>
+
             <Badge variant="outline">
               <IconTrendingUp />
               +12.5%
             </Badge>
-          </CardContent>
+          </div>
         </CardHeader>
         <CardFooter className="flex-col items-start gap-1.5 text-sm">
           <div className="line-clamp-1 flex gap-2 font-medium">
             Trending up this month <IconTrendingUp className="size-4" />
           </div>
-          <div className="text-muted-foreground">
-            Visitors for the last 6 months
-          </div>
+          <div className="text-muted-foreground">Todays revenue</div>
         </CardFooter>
       </Card>
       <Card className="@container/card">
         <CardHeader>
-          <CardDescription>New Customers</CardDescription>
-          <CardTitle className="text-2xl font-semibold tabular-nums @[250px]/card:text-3xl">
-            1,234
-          </CardTitle>
-          <CardContent>
+          <CardDescription>Total Revenue</CardDescription>
+          <div className="flex justify-between">
+            <CardTitle className="text-2xl font-semibold tabular-nums @[250px]/card:text-3xl">
+              {`GHC ${metrics?.totalOrdersToday.toFixed(2)}`}
+            </CardTitle>
+
             <Badge variant="outline">
               <IconTrendingDown />
               -20%
             </Badge>
-          </CardContent>
+          </div>
         </CardHeader>
         <CardFooter className="flex-col items-start gap-1.5 text-sm">
           <div className="line-clamp-1 flex gap-2 font-medium">
             Down 20% this period <IconTrendingDown className="size-4" />
           </div>
           <div className="text-muted-foreground">
-            Acquisition needs attention
+            Amount of revenue generated
           </div>
         </CardFooter>
       </Card>
       <Card className="@container/card">
         <CardHeader>
-          <CardDescription>Active Accounts</CardDescription>
-          <CardTitle className="text-2xl font-semibold tabular-nums @[250px]/card:text-3xl">
-            45,678
-          </CardTitle>
-          <CardContent>
+          <CardDescription>Pending Orders</CardDescription>
+          <div className="flex justify-between">
+            <CardTitle className="text-2xl font-semibold tabular-nums @[250px]/card:text-3xl">
+              {metrics?.pendingOrders}
+            </CardTitle>
+
             <Badge variant="outline">
               <IconTrendingUp />
               +12.5%
             </Badge>
-          </CardContent>
+          </div>
+        </CardHeader>
+        <CardFooter className="flex-col items-start gap-1.5 text-sm">
+          <div className="line-clamp-1 flex gap-2 font-medium">
+            Waitlist awaiting checkout
+          </div>
+          <div className="text-muted-foreground">
+            The number of pending orders
+          </div>
+        </CardFooter>
+      </Card>
+      <Card className="@container/card">
+        <CardHeader>
+          <CardDescription>Growth Rate</CardDescription>
+          <div className="flex justify-between">
+            <CardTitle className="text-2xl font-semibold tabular-nums @[250px]/card:text-3xl">
+              4.5%
+            </CardTitle>
+            <Badge variant="outline">
+              <IconTrendingUp />
+              +4.5%
+            </Badge>
+          </div>
+        </CardHeader>
+        <CardFooter className="flex-col items-start gap-1.5 text-sm">
+          <div className="line-clamp-1 flex gap-2 font-medium">
+            Steady performance increase <IconTrendingUp className="size-4" />
+          </div>
+          <div className="text-muted-foreground">Meets growth projections</div>
+        </CardFooter>
+      </Card>
+      {/* <Card className="@container/card">
+        <CardHeader>
+          <CardDescription>Active Accounts</CardDescription>
+           <div className="flex justify-between"><CardTitle className="text-2xl font-semibold tabular-nums @[250px]/card:text-3xl">
+            45,678
+          </CardTitle>
+         
+            <Badge variant="outline">
+              <IconTrendingUp />
+              +12.5%
+            </Badge>
+         </div>
         </CardHeader>
         <CardFooter className="flex-col items-start gap-1.5 text-sm">
           <div className="line-clamp-1 flex gap-2 font-medium">
@@ -80,15 +129,16 @@ export function SectionCards() {
       <Card className="@container/card">
         <CardHeader>
           <CardDescription>Growth Rate</CardDescription>
-          <CardTitle className="text-2xl font-semibold tabular-nums @[250px]/card:text-3xl">
+          <div className="flex justify-between">
+             <CardTitle className="text-2xl font-semibold tabular-nums @[250px]/card:text-3xl">
             4.5%
           </CardTitle>
-          <CardContent>
+         
             <Badge variant="outline">
               <IconTrendingUp />
               +4.5%
             </Badge>
-          </CardContent>
+          </div>
         </CardHeader>
         <CardFooter className="flex-col items-start gap-1.5 text-sm">
           <div className="line-clamp-1 flex gap-2 font-medium">
@@ -96,7 +146,7 @@ export function SectionCards() {
           </div>
           <div className="text-muted-foreground">Meets growth projections</div>
         </CardFooter>
-      </Card>
+      </Card> */}
     </div>
-  )
+  );
 }
