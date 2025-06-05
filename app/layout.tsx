@@ -5,6 +5,7 @@ import { OrderProvider } from "@/context/order-context";
 import { InventoryProvider } from "@/context/inventory-context";
 import { UserProvider } from "@/context/user-context";
 import { ToastProvider } from "@/context/toast-context";
+import { DashboardMetricsProvider } from "@/context/metric-context";
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -39,11 +40,13 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         <ToastProvider>
-          <UserProvider>
-            <InventoryProvider>
-              <OrderProvider>{children}</OrderProvider>
-            </InventoryProvider>
-          </UserProvider>
+          <DashboardMetricsProvider>
+            <UserProvider>
+              <InventoryProvider>
+                <OrderProvider>{children}</OrderProvider>
+              </InventoryProvider>
+            </UserProvider>
+          </DashboardMetricsProvider>
         </ToastProvider>
       </body>
     </html>

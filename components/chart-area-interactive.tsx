@@ -166,16 +166,17 @@ export function ChartAreaInteractive() {
 
   return (
     <Card className="@container/card">
-      <CardHeader>
-        <CardTitle>Total Visitors</CardTitle>
+      <CardHeader className="flex flex-row justify-between border ">
+        <div >
+        <CardTitle>Business Metrics Overview</CardTitle>
         <CardDescription>
           <span className="hidden @[540px]/card:block">
             Total for the last 3 months
           </span>
           <span className="@[540px]/card:hidden">Last 3 months</span>
         </CardDescription>
-        
-        <CardContent>
+        </div>
+        <CardContent >
           <ToggleGroup
             type="single"
             value={timeRange}
